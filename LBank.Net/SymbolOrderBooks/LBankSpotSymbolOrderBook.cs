@@ -39,7 +39,6 @@ namespace LBank.Net.SymbolOrderBooks
         /// <param name="symbol">The symbol the order book is for</param>
         /// <param name="optionsDelegate">Option configuration delegate</param>
         /// <param name="logger">Logger</param>
-        /// <param name="restClient">Rest client instance</param>
         /// <param name="socketClient">Socket client instance</param>
         public LBankSpotSymbolOrderBook(
             string symbol,

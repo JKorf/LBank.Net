@@ -14,9 +14,26 @@ namespace LBank.Net.Clients.MessageHandlers
 
         public override JsonSerializerOptions Options { get; } = LBankExchange._serializerContext;
 
+        public override bool RequiresSeekableStream => true;
+
         public LBankRestMessageHandler(ErrorMapping errorMapping)
         {
             _errorMapping = errorMapping;
+        }
+
+        public override async ValueTask<Error?> CheckForErrorResponse(RequestDefinition request, HttpResponseHeaders responseHeaders, Stream responseStream)
+        {
+            var (error, document) = await GetJsonDocument(responseStream).ConfigureAwait(false);
+            if (error != null)
+                return error;
+
+            int? code = document!.RootElement.TryGetProperty("error_code", out var codeProp) ? codeProp.GetInt32() : null;
+            string? msg = document.RootElement.TryGetProperty("msg", out var msgProp) ? msgProp.GetString() : null;
+            if (code == null || code == 0)
+                return null;
+
+            var errorInfo = _errorMapping.GetErrorInfo(code.ToString()!, msg);
+            return new ServerError(code.Value.ToString(), errorInfo);
         }
 
         public override async ValueTask<Error> ParseErrorResponse(
@@ -28,9 +45,7 @@ namespace LBank.Net.Clients.MessageHandlers
             if (error != null)
                 return error;
 
-#warning check
-
-            int? code = document!.RootElement.TryGetProperty("code", out var codeProp) ? codeProp.GetInt32() : null;
+            int? code = document!.RootElement.TryGetProperty("error_code", out var codeProp) ? codeProp.GetInt32() : null;
             string? msg = document.RootElement.TryGetProperty("msg", out var msgProp) ? msgProp.GetString() : null;
             if (msg == null)
                 return new ServerError(ErrorInfo.Unknown);
