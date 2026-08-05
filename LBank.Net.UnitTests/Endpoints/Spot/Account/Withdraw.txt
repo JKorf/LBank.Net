@@ -1,0 +1,11 @@
+POST
+/v2/spot/wallet/withdraw.do
+true
+BodyParams: {"address": "123","coin": "123","amount": 0.1,"fee": 0.1}
+{ 
+	"result": "true",
+	"data": {
+	  "fee": 2,
+	  "withdrawId": 93182
+	}
+}

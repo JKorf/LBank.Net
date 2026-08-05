@@ -1,0 +1,36 @@
+POST
+/v2/supplement/transaction_history.do
+true
+BodyParams: {"symbol": "eth_usdt"}
+{
+  "msg": "Success",
+  "result": true,
+  "data": [
+    {
+      "symbol": "eth_usdt", 
+      "quoteQty": 23.19370000000000000000,
+      "orderId": "cd58b6a0-7afa-47ae-9bbb-3a212bdab3bb", 
+      "price": 2319.37000000000000000000, 
+      "qty": 0.01000000000000000000,
+      "commission": 0.00051000000000000000,
+      "id": "da612956ee81297529d695683559516b20fdeba1",
+      "time": 1772335196000, 
+      "isMaker": false,
+      "isBuyer": true 
+    },
+    {
+      "symbol": "eth_usdt",
+      "quoteQty": 23.19960000000000000000,
+      "orderId": "a4cd386d-6d8b-47fa-9a45-daa10c6dab7a",
+      "price": 2319.96000000000000000000,
+      "qty": 0.01000000000000000000,
+      "commission": 1.18318000000000000000,
+      "id": "ada27f3c83ebffb7defd7a1699dd2f4d281fc033",
+      "time": 1772335196000,
+      "isMaker": false,
+      "isBuyer": false
+    }
+  ],
+  "error_code": 0,
+  "ts": 1772335196000
+}

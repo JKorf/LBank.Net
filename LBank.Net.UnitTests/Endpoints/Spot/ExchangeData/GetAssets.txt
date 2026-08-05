@@ -1,0 +1,53 @@
+GET
+/v2/assetConfigs.do
+false
+UriParams: {"assetCode": "eth"}
+  {
+  "result": "true",
+  "data": [
+    {
+      "assetCode": "btc",
+      "chainName": "btc",
+      "canDraw": true,
+      "canStationDraw": true,
+      "canDeposit": true,
+      "hasMemo": false,
+      "contractInfo": "0xdacxxxxxxxxxxx",
+      "assetFee": {
+        "type": 1,
+        "feeCode": "btc",
+        "scale": 4,
+        "minAmt": "0.001",
+        "feeAmt": "0.0002",
+        "feeRate": "0",
+        "stationFeeAmt": "0",
+        "stationScale": 4,
+        "stationMinAmt": "0.0001",
+        "minDepositAmt": "0.00001",
+        "depositFee": "0"
+      }
+    },
+    {
+      "assetCode": "usdt",
+      "chainName": "trc20",
+      "canDraw": true,
+      "canStationDraw": true,
+      "canDeposit": true,
+      "hasMemo": false,
+      "contractInfo": "0xdacxxxxxxxxxxx",
+      "assetFee": {
+        "type": 1,
+        "feeCode": "btc",
+        "scale": 4,
+        "minAmt": "0.001",
+        "feeAmt": "0.0001",
+        "feeRate": "0",
+        "stationFeeAmt": "0",
+        "stationScale": 4,
+        "stationMinAmt": "0.0001",
+        "minDepositAmt": "0.0001",
+        "depositFee": "0"
+      }
+    }
+  ]
+}

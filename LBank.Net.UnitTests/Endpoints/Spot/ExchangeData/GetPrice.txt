@@ -1,0 +1,15 @@
+GET
+/v2/supplement/ticker/price.do
+false
+UriParams: {}
+{
+  "result": true,
+  "data": [
+    {
+      "symbol": "btc_usdt",
+      "price": "73966.75"
+    }
+  ],
+  "error_code": 0,
+  "ts": 1772335196000
+}

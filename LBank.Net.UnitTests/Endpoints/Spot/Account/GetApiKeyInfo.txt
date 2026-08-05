@@ -1,0 +1,14 @@
+POST
+/v2/supplement/api_Restrictions.do
+true
+BodyParams: {}
+{
+    "result": "true",
+	"data": {
+	  "enableSpotTrading": true,
+	  "createTime": 1643091005000,
+	  "enableReading": true,
+	  "ipRestrict": true,
+	  "enableWithdrawals": true
+	}
+}

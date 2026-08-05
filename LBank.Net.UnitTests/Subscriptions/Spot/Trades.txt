@@ -1,0 +1,15 @@
+> { "action":"subscribe", "subscribe":"trade", "pair":"eth_usdt" }
+= 
+{
+         "trade":{
+             "volume":6.3607,
+             "amount":77148.9303,
+             "price":12129,
+             "direction":"sell",
+             "TS":"2019-06-28T19:55:49.460"
+         },
+         "type":"trade",
+         "pair":"eth_usdt",
+         "SERVER":"V2",
+         "TS":"2019-06-28T19:55:49.466"
+     }

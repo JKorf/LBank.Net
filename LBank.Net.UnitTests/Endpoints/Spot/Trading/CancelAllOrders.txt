@@ -1,0 +1,29 @@
+POST
+/v2/supplement/cancel_order_by_symbol.do
+true
+BodyParams: {"symbol": "eth_usdt"}
+{
+  "result": "true",
+  "data": [
+    {
+      "origClientOrderId": "4b11c4ac-d54a-4bb5-86f9-06322174a036",
+      "executedQty": 0.00000000000000000000,
+      "orderId": "fc2e51b9-2e6e-4949-a5f3-35a4f10c0554",
+      "price": 2200.00000000000000000000,
+      "origQty": 0.01000000000000000000,
+      "tradeType": "buy",
+      "status": 0
+    },
+    {
+      "origClientOrderId": "d6f6dc30-5de9-4fe9-ba70-ce6e173e114e",
+      "executedQty": 0.00000000000000000000,
+      "orderId": "2539cee7-a0de-4caa-bbbe-993d39bc8efb",
+      "price": 2210.00000000000000000000,
+      "origQty": 0.01000000000000000000,
+      "tradeType": "buy",
+      "status": 0
+    }
+  ],
+  "error_code": 0,
+  "ts": 1772335196000
+}

@@ -1,0 +1,15 @@
+POST
+/v2/supplement/create_order.do
+true
+BodyParams: {"symbol": "eth_usdt","type": "buy","amount": "0.1"}
+{
+  "msg": "Success",
+  "result": true,
+  "data": {
+    "symbol": "eth_usdt",
+    "order_id": "91dd58c4-370f-461d-0000-8cc3e83ddad3",
+    "custom_id": "8241275e-8666-4ab8-a84d-2e87f82e12ff"
+  },
+  "error_code": 0,
+  "ts": 1772335196000
+}

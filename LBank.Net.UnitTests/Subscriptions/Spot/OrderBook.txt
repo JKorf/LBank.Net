@@ -1,0 +1,31 @@
+> { "action":"subscribe", "subscribe":"depth", "depth":"100", "pair":"eth_usdt" }
+= 
+{
+         "depth":{
+             "asks":[
+                 [
+                     0.0252,
+                     0.5833
+                 ],
+                 [
+                     0.025215,
+                     4.377
+                 ]
+             ],
+             "bids":[
+                 [
+                     0.025135,
+                     3.962
+                 ],
+                 [
+                     0.025134,
+                     3.46
+                 ]
+             ]
+         },
+         "count":100,
+         "type":"depth",
+         "pair":"eth_usdt",
+         "SERVER":"V2",
+         "TS":"2019-06-28T17:49:22.722"
+     }

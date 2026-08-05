@@ -1,0 +1,12 @@
+POST
+/v2/supplement/get_deposit_address.do
+true
+BodyParams: {"coin": "123"}
+ {
+  "result": "true",
+  "data":{
+  "address": "0x1ccbf66250c9a665710e56e00b3a1502495dd269",
+  "memo": null,
+  "coin": "lbk"
+}
+}

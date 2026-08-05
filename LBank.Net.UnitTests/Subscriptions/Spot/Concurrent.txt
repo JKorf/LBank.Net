@@ -1,0 +1,4 @@
+>1 { "action":"subscribe", "subscribe":"kbar", "kbar":"1hr", "pair":"eth_usdt" }
+>2 { "action":"subscribe", "subscribe":"kbar", "kbar":"day", "pair":"eth_usdt" }
+=1 { "kbar":{ "slot":"day" }, "type":"kbar", "pair":"eth_usdt", "SERVER":"V2", "TS":"2019-06-28T17:49:22.722"}
+=2 { "kbar":{ "slot":"1hr" }, "type":"kbar", "pair":"eth_usdt", "SERVER":"V2", "TS":"2019-06-28T17:49:22.722"}

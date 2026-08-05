@@ -1,0 +1,24 @@
+GET
+/v2/ticker/24hr.do
+false
+UriParams: {}
+{
+  "msg": "Success",
+  "result": "true",
+  "data": [
+    {
+      "symbol": "btc_usdt",
+      "ticker": {
+        "high": "76000.38",
+        "vol": "12976.9135",
+        "low": "73281.22",
+        "change": "1.13",
+        "turnover": "966280941.61",
+        "latest": "74116.9"
+      },
+      "timestamp": 1772335196000
+    }
+  ],
+  "error_code": 0,
+  "ts": 1772335196000
+}

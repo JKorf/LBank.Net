@@ -1,0 +1,26 @@
+POST
+/v2/spot/wallet/deposit_history.do
+true
+BodyParams: {}
+{
+	"msg":"Success",
+	"result":"true",
+	"data":{
+		"total":1,
+		"depositOrders":[
+		{
+			"insertTime":1785748233000,
+			"amount":"14.99350000000000000000",
+			"address":"xxx",
+			"networkName":"polygon",
+			"txId":"xxx",
+			"coin":"usdt",
+			"status":"2"
+		}
+		],
+		"page_length":20,
+		"current_page":1
+	},
+	"error_code":0,
+	"ts":1785750485637
+}

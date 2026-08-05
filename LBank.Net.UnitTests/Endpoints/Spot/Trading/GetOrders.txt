@@ -1,0 +1,56 @@
+POST
+/v2/spot/trade/orders_info_history.do
+true
+BodyParams: {"symbol": "eth_usdt","current_page": 1,"page_length": 20}
+{
+  "msg": "Success",
+  "result": "true",
+  "data": {
+    "total": 1, 
+    "page_length": 10, 
+    "orders": [
+      {
+        "cummulativeQuoteQty": 0, 
+        "symbol": "eth_usdt", 
+        "executedQty": 0, 
+        "orderId": "2539cee7-a0de-4caa-bbbe-993d39bc8efb",
+        "origQty": 0.01, 
+        "price": 2210, 
+        "origQuoteOrderQty": 22.1,
+        "updateTime": 1772335196000, 
+        "time": 1772335196000, 
+        "type": "buy", 
+        "status": -1 
+      },
+      {
+        "cummulativeQuoteQty": 0,
+        "symbol": "eth_usdt",
+        "executedQty": 0,
+        "orderId": "fc2e51b9-2e6e-4949-a5f3-35a4f10c0554",
+        "origQty": 0.01,
+        "price": 2200,
+        "origQuoteOrderQty": 22,
+        "updateTime": 1772335196000,
+        "time": 1772335196000,
+        "type": "buy",
+        "status": -1
+      },
+      {
+        "cummulativeQuoteQty": 0,
+        "symbol": "eth_usdt",
+        "executedQty": 0,
+        "orderId": "5ca490f9-eede-45c7-82fe-89b6beb3fd7b",
+        "origQty": 0.01,
+        "price": 2200,
+        "origQuoteOrderQty": 22,
+        "updateTime": 1772335196000,
+        "time": 1772335196000,
+        "type": "buy",
+        "status": -1
+      }
+    ],
+    "current_page": 1 
+  },
+  "error_code": 0,
+  "ts": 1772335196000
+}

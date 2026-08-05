@@ -1,0 +1,44 @@
+POST
+/v2/supplement/user_info.do
+true
+BodyParams: {}
+{
+  "result": "true",
+  "data": [
+    {
+      "usableAmt": "4302.693",
+      "assetAmt": "4302.693",
+      "networkList": [
+        {
+          "isDefault": true,
+          "withdrawFeeRate": "0",
+          "name": "bep20(bsc)",
+          "withdrawMin": "10",
+          "minLimit": "0.0001",
+          "minDeposit": "0.0001",
+          "feeAssetCode": "doge",
+          "withdrawFee": "9.7059",
+          "type": 1,
+          "coin": "doge",
+          "network": "bsc"
+        },
+        {
+          "isDefault": false,
+          "withdrawFeeRate": "0",
+          "name": "dogecoin",
+          "withdrawMin": "10",
+          "minLimit": "0.0001",
+          "minDeposit": "10",
+          "feeAssetCode": "doge",
+          "withdrawFee": "9.7059",
+          "type": 1,
+          "coin": "doge",
+          "network": "dogecoin"
+        }
+      ],
+      "freezeAmt": "0",
+      "coin": "doge"
+    }
+  ],
+  "code": 0
+}

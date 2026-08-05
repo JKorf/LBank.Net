@@ -1,0 +1,21 @@
+> { "action":"subscribe", "subscribe":"tick", "pair":"eth_usdt" }
+= 
+{
+         "tick":{
+             "to_cny":76643.5,
+             "high":0.02719761,
+             "vol":497529.7686,
+             "low":0.02603071,
+             "change":2.54,
+             "usd":299.12,
+             "to_usd":11083.66,
+             "dir":"sell",
+             "turnover":13224.0186,
+             "latest":0.02698749,
+             "cny":2068.41
+         },
+         "type":"tick",
+         "pair":"eth_usdt",
+         "SERVER":"V2",
+         "TS":"2019-07-01T11:33:55.188"
+     }

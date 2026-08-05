@@ -1,0 +1,17 @@
+POST
+/v2/supplement/cancel_order.do
+true
+BodyParams: {"symbol": "eth_usdt"}
+{
+  "msg": "Success",
+  "result": true,
+  "data": {
+    "executedQty": 0.0,
+    "price": 2200.0,
+    "origQty": 0.01,
+    "tradeType": "buy",
+    "status": 0
+  },
+  "error_code": 0,
+  "ts": 1772335196000
+}

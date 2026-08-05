@@ -1,0 +1,19 @@
+GET
+/v2/accuracy.do
+false
+UriParams: {}
+{
+  "msg": "Success",
+  "result": "true",
+  "data": [
+    {
+      "minTranQua": "2",
+      "minOrderAmount": "2",
+      "priceAccuracy": "2",
+      "quantityAccuracy": "4",
+      "symbol": "pch_usdt"
+    }
+  ],
+  "error_code": 0,
+  "ts": 1772335196000
+}

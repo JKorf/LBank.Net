@@ -1,0 +1,24 @@
+POST
+/v2/spot/trade/orders_info.do
+true
+BodyParams: {"symbol": "eth_usdt"}
+{
+  "result": "true",
+  "msg": "Success",
+  "data": {
+    "cummulativeQuoteQty": 0,  
+    "symbol": "eth_usdt",  
+    "executedQty": 0,  
+    "orderId": "fc2e51b9-2e6e-4949-a5f3-35a4f10c0554", 
+    "origQty": 0.01, 
+    "price": 2200,  
+    "clientOrderId": "4b11c4ac-d54a-4bb5-86f9-06322174a036",
+    "origQuoteOrderQty": 22, 
+    "updateTime": 1772335196000, 
+    "time": 1772335196000, 
+    "type": "buy",
+    "status": -1 
+  },
+  "error_code": 0,
+  "ts": 1772335196000
+}

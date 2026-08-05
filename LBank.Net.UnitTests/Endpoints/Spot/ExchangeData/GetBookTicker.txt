@@ -1,0 +1,17 @@
+GET
+/v2/supplement/ticker/bookTicker.do
+false
+UriParams: {"symbol": "eth_usdt"}
+{
+  "result": "true",
+  "msg": "Success",
+  "data": {
+    "symbol": "btc_usdt",
+    "askPrice": "74054.58",
+    "askQty": "1.48603",
+    "bidQty": "0.399",
+    "bidPrice": "74054.57"
+  },
+  "error_code": 0,
+  "ts": 1772335196000
+}

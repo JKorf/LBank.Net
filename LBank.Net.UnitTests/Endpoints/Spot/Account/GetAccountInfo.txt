@@ -1,0 +1,32 @@
+POST
+/v2/supplement/user_info_account.do
+true
+BodyParams: {}
+{
+  "result": "true",
+  "data": {
+    "uid": "LBA0B12679", 
+    "balances": [
+      {
+        "asset": "usdt",
+        "free": "1000",
+        "locked": "0" 
+      },
+      {
+        "asset": "btc",
+        "free": "0.01",
+        "locked": "0"
+      },
+      {
+        "asset": "eth",
+        "free": "0.1",
+        "locked": "0"
+      }
+    ],
+    "canWithdraw": true, 
+    "canDeposit": true, 
+    "canTrade": true 
+  },
+  "error_code": 0,
+  "ts": 1772335196000
+}

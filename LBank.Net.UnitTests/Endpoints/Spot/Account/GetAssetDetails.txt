@@ -1,0 +1,23 @@
+POST
+/v2/supplement/asset_detail.do
+true
+BodyParams: {}
+{
+  "result": "true",
+  "data": {
+  "htmoon": {
+    "minWithdrawAmount": 0,
+    "stationDrawStatus": true,
+    "depositStatus": false,
+    "withdrawFee": 0, 
+    "withdrawStatus": false
+  },
+  "phx": {
+    "minWithdrawAmount": 0,
+    "stationDrawStatus": true,
+    "depositStatus": true,
+    "withdrawFee": 0,
+    "withdrawStatus": true
+  }
+}
+}

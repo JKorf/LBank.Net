@@ -1,0 +1,13 @@
+POST
+/v2/supplement/customer_trade_fee.do
+true
+BodyParams: {}
+{"result":"true","data":
+[
+  {
+    "symbol": "lbk_usdt",
+    "makerCommission": "0.10",
+    "takerCommission": "10.00"
+  }
+]
+}

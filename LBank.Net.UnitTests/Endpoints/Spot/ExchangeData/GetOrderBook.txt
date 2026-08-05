@@ -1,0 +1,13 @@
+GET
+/v2/depth.do
+false
+UriParams: {"symbol": "eth_usdt"}
+{
+  "result": "true",
+  "msg": "Success",
+  "data": {
+    "timestamp": 1772335196000
+  },
+  "error_code": 0,
+  "ts": 1772335196000
+}

@@ -1,0 +1,36 @@
+GET
+/v2/supplement/trades.do
+false
+UriParams: {"symbol": "eth_usdt"}
+{
+  "msg": "Success",
+  "result": "true",
+  "data": [
+    {
+      "quoteQty": 1250.2534918,
+      "price": 67617.82,
+      "qty": 0.01849,
+      "id": "3f860a598f654e829c18e5bd783c9efb",
+      "time": 1772334000388,
+      "isBuyerMaker": true
+    },
+    {
+      "quoteQty": 98.7154326,
+      "price": 67613.31,
+      "qty": 0.00146,
+      "id": "c737190226524851864efcbf4af7eaab",
+      "time": 1772334000648,
+      "isBuyerMaker": false
+    },
+    {
+      "quoteQty": 176.4707391,
+      "price": 67613.31,
+      "qty": 0.00261,
+      "id": "596aaa9f4ab648bc84befc3b687ddc99",
+      "time": 1772334000956,
+      "isBuyerMaker": false
+    }
+  ],
+  "error_code": 0,
+  "ts": 1772335196000
+}
