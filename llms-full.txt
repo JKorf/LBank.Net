@@ -4,7 +4,7 @@
 
 LBank.Net is a strongly typed client library for the LBank Spot REST and WebSocket APIs. It is based on CryptoExchange.Net and provides typed models and enums, result wrappers, authentication, client-side rate limiting, automatic socket reconnection, dependency injection, shared multi-exchange interfaces, synchronized local order books, trackers, logging, and native AOT support.
 
-Current repository package version: 0.1.0.
+Current repository package version: 1.0.0.
 Package ID: `LBank.Net`.
 CryptoExchange.Net dependency: 12.4.0.
 Target frameworks: netstandard2.0, netstandard2.1, net8.0, net9.0, net10.0.
