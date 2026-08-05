@@ -2,7 +2,7 @@
 //
 // Demonstrates: LBank REST and WebSocket result handling with transient retries.
 //
-// Setup: dotnet add package JKorf.LBank.Net
+// Setup: dotnet add package LBank.Net
 
 using CryptoExchange.Net.Objects;
 using CryptoExchange.Net.Objects.Sockets;

@@ -2,7 +2,7 @@
 //
 // Demonstrates: LBank Spot order placement, lookup, open orders, and cancellation.
 //
-// Setup: dotnet add package JKorf.LBank.Net
+// Setup: dotnet add package LBank.Net
 //
 // WARNING: This example submits a real order when used with live credentials.
 

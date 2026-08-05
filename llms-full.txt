@@ -1,1 +1,630 @@
-TODO
+# LBank.Net Full LLM Context
+
+> Detailed reference for generating correct C#/.NET integrations with LBank.Net. Use `docs/ai-api-map.md` for quick intent routing and the public interfaces under `LBank.Net/Interfaces/Clients/**` as the final source of truth.
+
+LBank.Net is a strongly typed client library for the LBank Spot REST and WebSocket APIs. It is based on CryptoExchange.Net and provides typed models and enums, result wrappers, authentication, client-side rate limiting, automatic socket reconnection, dependency injection, shared multi-exchange interfaces, synchronized local order books, trackers, logging, and native AOT support.
+
+Current repository package version: 0.1.0.
+Package ID: `LBank.Net`.
+CryptoExchange.Net dependency: 12.4.0.
+Target frameworks: netstandard2.0, netstandard2.1, net8.0, net9.0, net10.0.
+Native AOT: enabled on compatible target frameworks.
+
+Primary references:
+
+- `README.md`: overview, installation, supported features, basic usage, release notes
+- `docs/ai-api-map.md`: intent-to-method quick map
+- `Examples/ai-friendly/`: compilable workflow examples
+- `LBank.Net/Interfaces/Clients/**`: authoritative endpoint interfaces
+- https://cryptoexchange.jkorf.dev/LBank.Net/: generated library documentation
+- https://www.lbank.com/docs/: upstream API documentation
+
+## Golden rules for code generation
+
+- Use `LBankRestClient` and `LBankSocketClient`; do not write raw transport code for supported operations.
+- LBank.Net currently supports **Spot only**. Do not invent Futures, derivatives, unified-account, leverage, position, funding, or margin methods.
+- Native symbols use lowercase `base_quote` formatting, for example `eth_usdt`.
+- REST methods return `HttpResult<T>` or `HttpResult`; check `.Success` before `.Data`.
+- Socket subscriptions return `WebSocketResult<UpdateSubscription>`; check `.Success`, retain `.Data`, and unsubscribe.
+- Use `LBankCredentials`, with HMAC or RSA credentials. Never log secrets.
+- LBank combines side and execution behavior in `OrderType`.
+- For market buys, the `quantity` argument is quote-asset quantity.
+- REST klines use `KlineInterval`; WebSocket klines use `StreamKlineInterval`.
+- `GetKlinesAsync` requires `limit` and `afterTime`.
+- `GetOrdersAsync` and `GetOpenOrdersAsync` require `page` and `pageSize`.
+- WebSocket order-book depth is restricted to `10`, `50`, or `100`.
+- Reuse client instances; prefer dependency injection in long-running applications.
+- Pass cancellation tokens through application/service boundaries.
+- Do not assume the LBank order API is enabled for every account.
+- Do not assume a built-in sandbox/testnet environment exists.
+
+## Installation and usings
+
+```bash
+dotnet add package LBank.Net
+```
+
+Typical native REST and socket code:
+
+```csharp
+using LBank.Net;
+using LBank.Net.Clients;
+using LBank.Net.Enums;
+```
+
+Dependency injection:
+
+```csharp
+using LBank.Net.Interfaces;
+using LBank.Net.Interfaces.Clients;
+using Microsoft.Extensions.DependencyInjection;
+```
+
+Shared APIs:
+
+```csharp
+using CryptoExchange.Net.SharedApis;
+using LBank.Net.Clients;
+```
+
+## API surface
+
+```text
+LBankRestClient
+  .SpotApi
+    .ExchangeData
+    .Account
+    .Trading
+    .SharedClient
+
+LBankSocketClient
+  .SpotApi
+    SubscribeToTradeUpdatesAsync(...)
+    SubscribeToKlineUpdatesAsync(...)
+    SubscribeToOrderBookUpdatesAsync(...)
+    SubscribeToTickerUpdatesAsync(...)
+    SubscribeToOrderUpdatesAsync(...)
+    SubscribeToBalanceUpdatesAsync(...)
+    .SharedClient
+```
+
+The public interfaces are:
+
+```text
+ILBankRestClient
+ILBankSocketClient
+ILBankRestClientSpotApi
+ILBankRestClientSpotApiExchangeData
+ILBankRestClientSpotApiAccount
+ILBankRestClientSpotApiTrading
+ILBankSocketClientSpotApi
+```
+
+## Public REST example
+
+```csharp
+using LBank.Net.Clients;
+
+var client = new LBankRestClient();
+
+var result = await client.SpotApi.ExchangeData.GetTickersAsync("eth_usdt");
+if (!result.Success)
+{
+    Console.WriteLine($"Ticker failed: {result.Error}");
+    return;
+}
+
+var ticker = result.Data.SingleOrDefault();
+if (ticker != null)
+    Console.WriteLine(ticker.Ticker.LastPrice);
+```
+
+Native method names can return arrays even when a symbol filter is supplied. In particular, `GetTickersAsync` and `GetPriceAsync` return arrays; do not assume a single model.
+
+## Authentication
+
+Private Account and Trading calls require credentials.
+
+HMAC:
+
+```csharp
+var client = new LBankRestClient(options =>
+{
+    options.ApiCredentials = new LBankCredentials("API_KEY", "API_SECRET");
+});
+```
+
+Equivalent builder form:
+
+```csharp
+var credentials = new LBankCredentials()
+    .WithHMAC("API_KEY", "API_SECRET");
+```
+
+RSA XML:
+
+```csharp
+var credentials = new LBankCredentials()
+    .WithRSAXml("API_KEY", "PRIVATE_KEY_XML");
+```
+
+RSA PEM/Base64 is available on netstandard2.1 and modern .NET:
+
+```csharp
+var credentials = new LBankCredentials()
+    .WithRSAPem("API_KEY", "PRIVATE_KEY_PEM_OR_BASE64");
+```
+
+Only configure one credential set on a `LBankCredentials` instance.
+
+## Symbols, candles, and orders
+
+Use LBank's native lowercase underscore symbols:
+
+```csharp
+const string symbol = "eth_usdt";
+```
+
+Do not silently convert examples to `ETHUSDT`, `ETH-USDT`, or `ETH/USDT` for native calls. SharedApis uses `SharedSymbol`, and the shared client performs native formatting.
+
+REST kline:
+
+```csharp
+var klines = await client.SpotApi.ExchangeData.GetKlinesAsync(
+    "eth_usdt",
+    KlineInterval.OneMinute,
+    limit: 100,
+    afterTime: DateTime.UtcNow.AddHours(-2));
+```
+
+Socket kline:
+
+```csharp
+var sub = await socketClient.SpotApi.SubscribeToKlineUpdatesAsync(
+    "eth_usdt",
+    StreamKlineInterval.OneMinute,
+    update => Console.WriteLine(update.Data.ClosePrice));
+```
+
+`KlineInterval` includes one, five, fifteen, and thirty minutes; one, four, eight, and twelve hours; one day, week, and month. `StreamKlineInterval` has the same set except it has no eight-hour value.
+
+Order side and execution style are combined:
+
+```text
+BuyLimit / SellLimit
+BuyMarket / SellMarket
+BuyMaker / SellMaker
+BuyIoc / SellIoc
+BuyFok / SellFok
+```
+
+Do not generate a separate `OrderSide` parameter for `PlaceOrderAsync`.
+
+## Market-data endpoint map
+
+```text
+Server time
+  client.SpotApi.ExchangeData.GetServerTimeAsync()
+
+Available native symbol strings
+  client.SpotApi.ExchangeData.GetAvailableSymbolsAsync()
+
+Symbol precision and order rules
+  client.SpotApi.ExchangeData.GetSymbolsAsync()
+  client.SpotApi.ExchangeData.GetSymbolsAsync("eth_usdt")
+
+Configuration for a specific asset and its networks
+  client.SpotApi.ExchangeData.GetAssetsAsync("eth")
+
+Order-book snapshot
+  client.SpotApi.ExchangeData.GetOrderBookAsync("eth_usdt", limit: 20)
+
+Latest price
+  client.SpotApi.ExchangeData.GetPriceAsync("eth_usdt")
+
+Best bid/ask
+  client.SpotApi.ExchangeData.GetBookTickerAsync("eth_usdt")
+
+24-hour tickers
+  client.SpotApi.ExchangeData.GetTickersAsync("eth_usdt")
+  client.SpotApi.ExchangeData.GetTickersAsync()
+
+Leveraged-token tickers
+  client.SpotApi.ExchangeData.GetLeveragedTokenTickersAsync("eth3l_usdt")
+
+Recent trades
+  client.SpotApi.ExchangeData.GetTradesAsync("eth_usdt", limit: 100)
+
+Candles
+  client.SpotApi.ExchangeData.GetKlinesAsync(
+      "eth_usdt", KlineInterval.OneMinute, 100, afterTime)
+```
+
+Native REST limits documented by the interface:
+
+- Order book: maximum 200.
+- Recent trades: maximum 500.
+- Klines: maximum 2000.
+
+## Account and wallet endpoint map
+
+All of these calls require credentials:
+
+```text
+API-key permissions
+  client.SpotApi.Account.GetApiKeyInfoAsync()
+
+Balances plus asset/network data
+  client.SpotApi.Account.GetUserAssetsAsync()
+
+Account info and balances
+  client.SpotApi.Account.GetAccountInfoAsync()
+
+Withdraw
+  client.SpotApi.Account.WithdrawAsync(
+      address, asset, quantity, fee,
+      network, memo, notes, name, clientOrderId, internalTransfer)
+
+Deposit history
+  client.SpotApi.Account.GetDepositHistoryAsync(
+      asset, status, startTime, endTime)
+
+Withdrawal history
+  client.SpotApi.Account.GetWithdrawHistoryAsync(
+      asset, status, clientOrderId, startTime, endTime)
+
+Deposit address
+  client.SpotApi.Account.GetDepositAddressAsync(asset, network)
+
+Asset details
+  client.SpotApi.Account.GetAssetDetailsAsync(asset)
+
+Trading fees
+  client.SpotApi.Account.GetTradeFeeAsync(symbol)
+
+Create/refresh/destroy listen key
+  client.SpotApi.Account.StartUserStreamAsync()
+  client.SpotApi.Account.KeepAliveUserStreamAsync(listenKey)
+  client.SpotApi.Account.StopUserStreamAsync(listenKey)
+```
+
+Withdrawal code must preserve exact address, memo/tag, network, quantity, and fee semantics. Do not guess a network or omit a memo when the destination requires one.
+
+## Trading endpoint map and example
+
+```text
+Place order
+  client.SpotApi.Trading.PlaceOrderAsync(
+      symbol, orderType, quantity, price, clientOrderId, receiveWindow)
+
+Get one order
+  client.SpotApi.Trading.GetOrderAsync(
+      symbol, orderId: orderId)
+  client.SpotApi.Trading.GetOrderAsync(
+      symbol, clientOrderId: clientOrderId)
+
+Cancel one order
+  client.SpotApi.Trading.CancelOrderAsync(
+      symbol, orderId: orderId)
+  client.SpotApi.Trading.CancelOrderAsync(
+      symbol, clientOrderId: clientOrderId)
+
+Cancel all orders for a symbol
+  client.SpotApi.Trading.CancelAllOrdersAsync(symbol)
+
+Order history
+  client.SpotApi.Trading.GetOrdersAsync(
+      symbol, page, pageSize, status)
+
+Open orders
+  client.SpotApi.Trading.GetOpenOrdersAsync(
+      symbol, page, pageSize)
+
+User trades
+  client.SpotApi.Trading.GetUserTradesAsync(
+      symbol, fromId, startTime, endTime, limit)
+```
+
+Complete order example:
+
+```csharp
+using LBank.Net;
+using LBank.Net.Clients;
+using LBank.Net.Enums;
+
+var client = new LBankRestClient(options =>
+{
+    options.ApiCredentials = new LBankCredentials("API_KEY", "API_SECRET");
+});
+
+var result = await client.SpotApi.Trading.PlaceOrderAsync(
+    symbol: "eth_usdt",
+    orderType: OrderType.BuyLimit,
+    quantity: 0.01m,
+    price: 2000m);
+
+if (!result.Success)
+{
+    Console.WriteLine($"Order failed: {result.Error}");
+    return;
+}
+
+Console.WriteLine($"Order ID: {result.Data.OrderId}");
+```
+
+Market-buy quantity:
+
+```csharp
+var result = await client.SpotApi.Trading.PlaceOrderAsync(
+    "eth_usdt",
+    OrderType.BuyMarket,
+    quantity: 100m); // 100 USDT, not 100 ETH
+```
+
+The LBank API documentation notes that order API availability can be restricted. A valid implementation may still receive an account/permission error; return that error to the caller.
+
+## WebSocket subscriptions
+
+Public subscriptions:
+
+```csharp
+var tradeSub = await socketClient.SpotApi.SubscribeToTradeUpdatesAsync(
+    "eth_usdt",
+    update => Console.WriteLine($"{update.Data.Quantity} @ {update.Data.Price}"));
+
+var tickerSub = await socketClient.SpotApi.SubscribeToTickerUpdatesAsync(
+    "eth_usdt",
+    update => Console.WriteLine(update.Data.LastPrice));
+
+var klineSub = await socketClient.SpotApi.SubscribeToKlineUpdatesAsync(
+    "eth_usdt",
+    StreamKlineInterval.OneMinute,
+    update => Console.WriteLine(update.Data.ClosePrice));
+
+var bookSub = await socketClient.SpotApi.SubscribeToOrderBookUpdatesAsync(
+    "eth_usdt",
+    depth: 50,
+    update => Console.WriteLine(update.Data.Bids.FirstOrDefault()?.Price));
+```
+
+Order book depth must be 10, 50, or 100.
+
+Private subscriptions can receive an explicit listen key:
+
+```csharp
+var key = await restClient.SpotApi.Account.StartUserStreamAsync();
+if (!key.Success)
+    return;
+
+var sub = await socketClient.SpotApi.SubscribeToOrderUpdatesAsync(
+    key.Data,
+    update => Console.WriteLine(update.Data.Status));
+```
+
+Or allow an authenticated socket client to manage the listen key:
+
+```csharp
+var socketClient = new LBankSocketClient(options =>
+{
+    options.ApiCredentials = new LBankCredentials("API_KEY", "API_SECRET");
+});
+
+var orderSub = await socketClient.SpotApi.SubscribeToOrderUpdatesAsync(
+    listenKey: null,
+    update => Console.WriteLine(update.Data.Status));
+
+var balanceSub = await socketClient.SpotApi.SubscribeToBalanceUpdatesAsync(
+    listenKey: null,
+    update => Console.WriteLine(update.Data.Free));
+```
+
+Always validate and tear down:
+
+```csharp
+if (!tickerSub.Success)
+{
+    Console.WriteLine(tickerSub.Error);
+    return;
+}
+
+await socketClient.UnsubscribeAsync(tickerSub.Data);
+```
+
+`LBankSocketOptions.UseV3` defaults to `true`. It selects the more stable, not officially documented v3 implementation for public streams. Set it to `false` only when the v2 public socket behavior is explicitly required:
+
+```csharp
+var socketClient = new LBankSocketClient(options =>
+{
+    options.UseV3 = false;
+});
+```
+
+## Dependency injection
+
+```csharp
+using LBank.Net;
+using LBank.Net.Interfaces.Clients;
+using Microsoft.Extensions.DependencyInjection;
+
+var services = new ServiceCollection();
+services.AddLBank(options =>
+{
+    options.ApiCredentials = new LBankCredentials("API_KEY", "API_SECRET");
+    options.Rest.RequestTimeout = TimeSpan.FromSeconds(15);
+});
+
+await using var provider = services.BuildServiceProvider();
+var restClient = provider.GetRequiredService<ILBankRestClient>();
+var socketClient = provider.GetRequiredService<ILBankSocketClient>();
+```
+
+`AddLBank` also registers the order-book factory, tracker factory, user-client provider, and supported SharedApis interfaces. Configuration binding is available through the `AddLBank(IConfiguration)` overload.
+
+## Local order book
+
+```csharp
+using LBank.Net.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
+
+var factory = provider.GetRequiredService<ILBankOrderBookFactory>();
+var book = factory.CreateSpot(
+    "eth_usdt",
+    options =>
+    {
+        options.Limit = 50;
+        options.InitialDataTimeout = TimeSpan.FromSeconds(15);
+    });
+
+var start = await book.StartAsync();
+if (!start.Success)
+{
+    Console.WriteLine(start.Error);
+    return;
+}
+
+var snapshot = book.Book;
+var bestBid = snapshot.bids.FirstOrDefault();
+var bestAsk = snapshot.asks.FirstOrDefault();
+
+await book.StopAsync();
+```
+
+The local Spot book is synchronized from LBank market data. Use a supported stream depth for `Limit` and stop it during shutdown.
+
+## Trackers
+
+`ILBankTrackerFactory` exposes CryptoExchange.Net trackers:
+
+```text
+CreateKlineTracker(...)
+CreateTradeTracker(...)
+CreateUserSpotDataTracker(...)
+```
+
+The user-data tracker combines shared account/order REST clients with shared balance/order socket clients. Supply credentials through DI or use the overload accepting a user identifier and `LBankCredentials`.
+
+## SharedApis
+
+REST shared client:
+
+```csharp
+var shared = new LBankRestClient().SpotApi.SharedClient;
+var symbol = new SharedSymbol(TradingMode.Spot, "ETH", "USDT");
+
+var result = await shared.GetSpotTickerAsync(
+    new GetTickerRequest(symbol));
+```
+
+Socket shared client:
+
+```csharp
+var socketClient = new LBankSocketClient();
+var shared = socketClient.SpotApi.SharedClient;
+var symbol = new SharedSymbol(TradingMode.Spot, "ETH", "USDT");
+
+var sub = await shared.SubscribeToTickerUpdatesAsync(
+    new SubscribeTickerRequest(symbol),
+    update => Console.WriteLine(update.Data.LastPrice));
+
+if (sub.Success)
+    await socketClient.UnsubscribeAsync(sub.Data);
+```
+
+The concrete shared REST interface implements:
+
+```text
+IAssetsRestClient
+IBalanceRestClient
+IBookTickerRestClient
+IDepositRestClient
+IFeeRestClient
+IKlineRestClient
+IOrderBookRestClient
+IRecentTradeRestClient
+IWithdrawalRestClient
+IWithdrawRestClient
+ISpotSymbolRestClient
+ISpotTickerRestClient
+ISpotOrderRestClient
+ISpotOrderClientIdRestClient
+```
+
+The concrete shared socket interface implements:
+
+```text
+IBalanceSocketClient
+IKlineSocketClient
+ITradeSocketClient
+IOrderBookSocketClient
+ITickerSocketClient
+ISpotOrderSocketClient
+```
+
+Call `Discover()` or inspect operation options before assuming optional capabilities. Specifically, LBank supports getting configuration for one asset but does not expose an API to retrieve the complete asset list, so the shared all-assets operation is unavailable.
+
+## Environments
+
+The only built-in environment is:
+
+```csharp
+LBankEnvironment.Live
+```
+
+For proxies, compatible gateways, or controlled test endpoints, create a custom environment with all three required addresses:
+
+```csharp
+var custom = LBankEnvironment.CreateCustom(
+    name: "Custom",
+    spotRestAddress: "https://rest.example/",
+    spotSocketStreamsAddress: "wss://socket-v2.example/",
+    spotSocketStreamsV3Address: "wss://socket-v3.example/");
+```
+
+Do not describe a custom endpoint as an official LBank sandbox unless the user has independently established that fact.
+
+## Error handling and retry
+
+```csharp
+async Task<HttpResult<T>> WithRetry<T>(
+    Func<Task<HttpResult<T>>> call,
+    int maxAttempts = 3)
+{
+    HttpResult<T> last = default!;
+
+    for (var attempt = 1; attempt <= maxAttempts; attempt++)
+    {
+        last = await call();
+        if (last.Success || last.Error?.IsTransient != true)
+            return last;
+
+        await Task.Delay(TimeSpan.FromMilliseconds(
+            250 * Math.Pow(2, attempt - 1)));
+    }
+
+    return last;
+}
+```
+
+Retry only transient failures. Do not automatically retry order placement or withdrawals unless the application has an idempotency/reconciliation strategy; a timeout can occur after the exchange accepted a state-changing request.
+
+## Anti-hallucination checklist
+
+Before emitting code, verify:
+
+1. The root is `SpotApi`; no Futures/derivatives root exists.
+2. Native symbols use `eth_usdt`.
+3. The client is `LBankRestClient` or `LBankSocketClient`.
+4. Credentials use `LBankCredentials`.
+5. The code checks `.Success`.
+6. An order uses combined `OrderType`.
+7. A REST kline uses `KlineInterval`.
+8. A socket kline uses `StreamKlineInterval`.
+9. `GetKlinesAsync` includes `limit` and `afterTime`.
+10. Order-history/open-order calls include `page` and `pageSize`.
+11. Socket order-book depth is 10, 50, or 100.
+12. Socket subscriptions are retained and unsubscribed.
+13. Market-buy quantity is treated as quote quantity.
+14. No official testnet is assumed.
+15. State-changing operations preserve API errors and are not blindly retried.
+
+When a method or parameter is uncertain, inspect `LBank.Net/Interfaces/Clients/**` rather than inferring it from another exchange library.

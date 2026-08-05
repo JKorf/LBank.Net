@@ -2,7 +2,7 @@
 //
 // Demonstrates: LBank public Spot REST data and authenticated balances.
 //
-// Setup: dotnet add package JKorf.LBank.Net
+// Setup: dotnet add package LBank.Net
 
 using LBank.Net;
 using LBank.Net.Clients;

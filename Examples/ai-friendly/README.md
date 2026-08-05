@@ -44,7 +44,7 @@ new LBankCredentials("API_KEY", "API_SECRET")
 ```bash
 dotnet new console -n MyLBankApp
 cd MyLBankApp
-dotnet add package JKorf.LBank.Net
+dotnet add package LBank.Net
 # Copy one example into Program.cs
 dotnet run
 ```

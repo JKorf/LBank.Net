@@ -20,7 +20,6 @@ namespace LBank.Net.Clients
          /// <inheritdoc />
         public ILBankSocketClientSpotApi SpotApi { get; }
 
-
         #endregion
 
         #region constructor/destructor

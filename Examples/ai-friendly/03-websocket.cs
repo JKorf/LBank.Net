@@ -2,7 +2,7 @@
 //
 // Demonstrates: LBank public and authenticated Spot WebSocket subscriptions.
 //
-// Setup: dotnet add package JKorf.LBank.Net
+// Setup: dotnet add package LBank.Net
 
 using LBank.Net;
 using LBank.Net.Clients;

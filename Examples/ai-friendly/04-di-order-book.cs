@@ -3,7 +3,7 @@
 // Demonstrates: dependency injection and LBank's synchronized local Spot order book.
 //
 // Setup:
-//   dotnet add package JKorf.LBank.Net
+//   dotnet add package LBank.Net
 //   dotnet add package Microsoft.Extensions.DependencyInjection
 
 using LBank.Net.Interfaces;

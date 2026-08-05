@@ -1,1 +1,45 @@
-TODO
+# LBank.Net
+
+> Strongly typed .NET client for the LBank Spot REST and WebSocket APIs, built on CryptoExchange.Net. Supports public market data, authenticated account/wallet and order operations, socket subscriptions, shared multi-exchange interfaces, synchronized local order books, trackers, dependency injection, rate limiting, reconnection, and native AOT.
+
+LBank.Net currently exposes Spot only; there is no Futures or derivatives client root. Native symbols use lowercase `base_quote` form such as `eth_usdt`. REST and socket operations use the `HttpResult<T>` / `WebSocketResult<T>` success-check pattern. Current repository package version: 0.1.0. Targets netstandard2.0, netstandard2.1, net8.0, net9.0, net10.0.
+
+## Critical usage rules
+
+- Install with `dotnet add package LBank.Net`.
+- REST: `new LBankRestClient().SpotApi`.
+- WebSocket: `new LBankSocketClient().SpotApi`.
+- REST routing: `.ExchangeData`, `.Account`, and `.Trading`.
+- Check `.Success` before reading `.Data`.
+- Use `LBankCredentials` for HMAC or RSA authentication.
+- Use native symbols such as `eth_usdt`, not `ETHUSDT`.
+- Use combined order values such as `OrderType.BuyLimit`; do not supply separate side/time-in-force arguments.
+- REST candles use `KlineInterval`; WebSocket candles use `StreamKlineInterval`.
+- Order book stream depth must be 10, 50, or 100.
+- Store socket subscriptions and call `socketClient.UnsubscribeAsync(subscription.Data)`.
+- Do not invent Futures, margin, or derivatives methods.
+
+## Documentation
+
+- [README](https://github.com/JKorf/LBank.Net/blob/main/README.md): installation, supported features, basic examples, and release notes
+- [Documentation site](https://cryptoexchange.jkorf.dev/LBank.Net/): client and API reference
+- [AI API quick map](https://github.com/JKorf/LBank.Net/blob/main/docs/ai-api-map.md): intent-to-method routing for the implemented API
+- [Full LLM context](https://github.com/JKorf/LBank.Net/blob/main/llms-full.txt): setup, authentication, endpoint map, examples, and anti-hallucination rules
+- [Source interfaces](https://github.com/JKorf/LBank.Net/tree/main/LBank.Net/Interfaces/Clients): authoritative public client surface
+
+## Examples
+
+- [AI-friendly examples](https://github.com/JKorf/LBank.Net/tree/main/Examples/ai-friendly): small compilable console examples
+- [Spot quickstart](https://github.com/JKorf/LBank.Net/blob/main/Examples/ai-friendly/01-spot-quickstart.cs): symbols, tickers, order book, candles, and balances
+- [Spot trading](https://github.com/JKorf/LBank.Net/blob/main/Examples/ai-friendly/02-spot-trading.cs): place, query, paginate, and cancel orders
+- [WebSocket](https://github.com/JKorf/LBank.Net/blob/main/Examples/ai-friendly/03-websocket.cs): public and authenticated subscriptions with teardown
+- [DI and local order book](https://github.com/JKorf/LBank.Net/blob/main/Examples/ai-friendly/04-di-order-book.cs): service registration and synchronized order book
+- [Error handling](https://github.com/JKorf/LBank.Net/blob/main/Examples/ai-friendly/05-error-handling.cs): REST/socket result handling and transient retry
+
+## Reference
+
+- [LBank API documentation](https://www.lbank.com/docs/)
+- [CryptoExchange.Net](https://github.com/JKorf/CryptoExchange.Net): shared base library and abstractions
+- [CryptoClients.Net](https://github.com/JKorf/CryptoClients.Net): combined access to exchange libraries
+- [NuGet package](https://www.nuget.org/packages/LBank.Net)
+- [Discord community](https://discord.gg/MSpeEtSY8t)
