@@ -2,7 +2,7 @@
 
 > Strongly typed .NET client for the LBank Spot REST and WebSocket APIs, built on CryptoExchange.Net. Supports public market data, authenticated account/wallet and order operations, socket subscriptions, shared multi-exchange interfaces, synchronized local order books, trackers, dependency injection, rate limiting, reconnection, and native AOT.
 
-LBank.Net currently exposes Spot only; there is no Futures or derivatives client root. Native symbols use lowercase `base_quote` form such as `eth_usdt`. REST and socket operations use the `HttpResult<T>` / `WebSocketResult<T>` success-check pattern. Current repository package version: 1.0.0. Targets netstandard2.0, netstandard2.1, net8.0, net9.0, net10.0.
+LBank.Net currently exposes Spot only; there is no Futures or derivatives client root. Native symbols use lowercase `base_quote` form such as `eth_usdt`. REST and socket operations use the `HttpResult<T>` / `WebSocketResult<T>` success-check pattern. Current repository package version: 1.0.1. Targets netstandard2.0, netstandard2.1, net8.0, net9.0, net10.0.
 
 ## Critical usage rules
 
