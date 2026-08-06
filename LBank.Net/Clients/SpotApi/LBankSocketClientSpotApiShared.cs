@@ -96,7 +96,7 @@ namespace LBank.Net.Clients.SpotApi
                     update.Symbol!,
                     new SharedOrderQuantity(update.Data.Quantity, update.Data.QuoteQuantity),
                     update.Data.Price,
-                    update.Data.Timestamp)
+                    update.Data.TimestampUtc)
                 {
                     Side = update.Data.Side == OrderSide.Buy ? SharedOrderSide.Buy : SharedOrderSide.Sell
                 }])), ct).ConfigureAwait(false);
