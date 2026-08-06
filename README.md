@@ -208,6 +208,10 @@ A Discord server is available [here](https://discord.gg/MSpeEtSY8t). For discuss
 ## Support the project
 Any support is greatly appreciated.
 
+### Referal
+If you do not yet have an account please consider using this referal link to sign up:  
+[Link](https://www.lbank.com/ref/60SLT)
+
 ### Donate
 Make a one time donation in a crypto currency of your choice. If you prefer to donate in a different currency or network send me a message.
    
