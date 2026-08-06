@@ -25,10 +25,14 @@ public record LBankTradeUpdate
     [JsonPropertyName("amount")]
     public decimal QuoteQuantity { get; set; }
     /// <summary>
-    /// ["<c>TS</c>"] Timestamp
+    /// ["<c>TS</c>"] Timestamp, note this is UTC+8
     /// </summary>
     [JsonPropertyName("TS")]
     public DateTime Timestamp { get; set; }
+    /// <summary>
+    /// Timestamp in UTC
+    /// </summary>
+    public DateTime TimestampUtc => Timestamp.AddHours(-8);
     /// <summary>
     /// ["<c>direction</c>"] Side
     /// </summary>

@@ -108,14 +108,14 @@ namespace LBank.Net.Clients.SpotApi
         {
             var internalHandler = new Action<DateTime, string?, LBankTradeUpdateMessage>((receiveTime, originalData, data) =>
             {
-                UpdateTimeOffset(data.Timestamp);
+                UpdateTimeOffset(data.TimestampUtc);
 
                 onMessage(
                     new DataEvent<LBankTradeUpdate>(LBankExchange.Metadata.Id, data.Trade, receiveTime, originalData)
                         .WithUpdateType(SocketUpdateType.Update)
                         .WithStreamId(data.Topic)
                         .WithSymbol(data.Symbol)
-                        .WithDataTimestamp(data.Timestamp, GetTimeOffset())
+                        .WithDataTimestamp(data.TimestampUtc, GetTimeOffset())
                     );
             });
 
@@ -128,14 +128,14 @@ namespace LBank.Net.Clients.SpotApi
         {
             var internalHandler = new Action<DateTime, string?, LBankKlineUpdateMessage>((receiveTime, originalData, data) =>
             {
-                UpdateTimeOffset(data.Timestamp);
+                UpdateTimeOffset(data.TimestampUtc);
 
                 onMessage(
                     new DataEvent<LBankKlineUpdate>(LBankExchange.Metadata.Id, data.Kline, receiveTime, originalData)
                         .WithUpdateType(SocketUpdateType.Update)
                         .WithStreamId(data.Topic)
                         .WithSymbol(data.Symbol)
-                        .WithDataTimestamp(data.Timestamp, GetTimeOffset())
+                        .WithDataTimestamp(data.TimestampUtc, GetTimeOffset())
                     );
             });
 
@@ -150,14 +150,14 @@ namespace LBank.Net.Clients.SpotApi
 
             var internalHandler = new Action<DateTime, string?, LBankOrderBookUpdateMessage>((receiveTime, originalData, data) =>
             {
-                UpdateTimeOffset(data.Timestamp);
+                UpdateTimeOffset(data.TimestampUtc);
 
                 onMessage(
                     new DataEvent<LBankOrderBookUpdate>(LBankExchange.Metadata.Id, data.OrderBook, receiveTime, originalData)
                         .WithUpdateType(SocketUpdateType.Update)
                         .WithStreamId(data.Topic)
                         .WithSymbol(data.Symbol)
-                        .WithDataTimestamp(data.Timestamp, GetTimeOffset())
+                        .WithDataTimestamp(data.TimestampUtc, GetTimeOffset())
                     );
             });
 
@@ -170,14 +170,14 @@ namespace LBank.Net.Clients.SpotApi
         {
             var internalHandler = new Action<DateTime, string?, LBankTickerUpdateMessage>((receiveTime, originalData, data) =>
             {
-                UpdateTimeOffset(data.Timestamp);
+                UpdateTimeOffset(data.TimestampUtc);
 
                 onMessage(
                     new DataEvent<LBankTickerUpdate>(LBankExchange.Metadata.Id, data.Ticker, receiveTime, originalData)
                         .WithUpdateType(SocketUpdateType.Update)
                         .WithStreamId(data.Topic)
                         .WithSymbol(data.Symbol)
-                        .WithDataTimestamp(data.Timestamp, GetTimeOffset())
+                        .WithDataTimestamp(data.TimestampUtc, GetTimeOffset())
                     );
             });
 
@@ -208,14 +208,14 @@ namespace LBank.Net.Clients.SpotApi
             var lk = listenKey ?? lease!.Token.Token;
             var internalHandler = new Action<DateTime, string?, LBankOrderUpdateMessage>((receiveTime, originalData, data) =>
             {
-                UpdateTimeOffset(data.Timestamp);
+                UpdateTimeOffset(data.TimestampUtc);
 
                 onMessage(
                     new DataEvent<LBankOrderUpdate>(LBankExchange.Metadata.Id, data.Order, receiveTime, originalData)
                         .WithUpdateType(SocketUpdateType.Update)
                         .WithStreamId(data.Topic)
                         .WithSymbol(data.Symbol)
-                        .WithDataTimestamp(data.Timestamp, GetTimeOffset())
+                        .WithDataTimestamp(data.TimestampUtc, GetTimeOffset())
                     );
             });
 
@@ -249,14 +249,14 @@ namespace LBank.Net.Clients.SpotApi
             var lk = listenKey ?? lease!.Token.Token;
             var internalHandler = new Action<DateTime, string?, LBankBalanceUpdateMessage>((receiveTime, originalData, data) =>
             {
-                UpdateTimeOffset(data.Timestamp);
+                UpdateTimeOffset(data.TimestampUtc);
 
                 onMessage(
                     new DataEvent<LBankBalanceUpdate>(LBankExchange.Metadata.Id, data.Balance, receiveTime, originalData)
                         .WithUpdateType(SocketUpdateType.Update)
                         .WithStreamId(data.Topic)
                         .WithSymbol(data.Symbol)
-                        .WithDataTimestamp(data.Timestamp, GetTimeOffset())
+                        .WithDataTimestamp(data.TimestampUtc, GetTimeOffset())
                     );
             });
 

@@ -8,6 +8,7 @@ namespace LBank.Net.Objects.Internal
     {
         [JsonPropertyName("TS")]
         public DateTime Timestamp { get; set; }
+        public DateTime TimestampUtc => Timestamp.AddHours(-8);
         [JsonPropertyName("type")]
         public string Topic { get; set; } = string.Empty;
         [JsonPropertyName("pair")]
