@@ -221,6 +221,10 @@ Make a one time donation in a crypto currency of your choice. If you prefer to d
 Alternatively, sponsor me on Github using [Github Sponsors](https://github.com/sponsors/JKorf). 
 
 ## Release notes
+* Version 1.0.2 - 07 Aug 2026
+    * Added OrderSide mapping
+    * Fixed Shared websocket trade updates not being in UTC
+
 * Version 1.0.1 - 06 Aug 2026
     * Fixed timestamps from websocket updates not being UTC
 
