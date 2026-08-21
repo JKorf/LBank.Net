@@ -2,7 +2,7 @@
 
 > Strongly typed .NET client for the LBank Spot REST and WebSocket APIs, built on CryptoExchange.Net. Supports public market data, authenticated account/wallet and order operations, socket subscriptions, shared multi-exchange interfaces, synchronized local order books, trackers, dependency injection, rate limiting, reconnection, and native AOT.
 
-LBank.Net currently exposes Spot only; there is no Futures or derivatives client root. Native symbols use lowercase `base_quote` form such as `eth_usdt`. REST and socket operations use the `HttpResult<T>` / `WebSocketResult<T>` success-check pattern. Current repository package version: 1.0.2. Targets netstandard2.0, netstandard2.1, net8.0, net9.0, net10.0.
+LBank.Net currently exposes Spot only; there is no Futures or derivatives client root. Native symbols use lowercase `base_quote` form such as `eth_usdt`. REST and socket operations use the `HttpResult<T>` / `WebSocketResult<T>` success-check pattern. Current repository package version: 1.1.0. Targets netstandard2.0, netstandard2.1, net8.0, net9.0, net10.0.
 
 ## Critical usage rules
 
@@ -22,7 +22,7 @@ LBank.Net currently exposes Spot only; there is no Futures or derivatives client
 ## Documentation
 
 - [README](https://github.com/JKorf/LBank.Net/blob/main/README.md): installation, supported features, basic examples, and release notes
-- [Documentation site](https://cryptoexchange.jkorf.dev/LBank.Net/): client and API reference
+- [Documentation site](https://cryptoexchange.jkorf.dev/docs/exchange-clients?library=LBank.Net): client guide and API reference
 - [AI API quick map](https://github.com/JKorf/LBank.Net/blob/main/docs/ai-api-map.md): intent-to-method routing for the implemented API
 - [Full LLM context](https://github.com/JKorf/LBank.Net/blob/main/llms-full.txt): setup, authentication, endpoint map, examples, and anti-hallucination rules
 - [Source interfaces](https://github.com/JKorf/LBank.Net/tree/main/LBank.Net/Interfaces/Clients): authoritative public client surface

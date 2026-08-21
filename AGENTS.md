@@ -201,6 +201,8 @@ var ticker = await shared.GetSpotTickerAsync(new GetTickerRequest(symbol));
 
 The REST shared client supports Spot symbols, tickers, orders, balances, assets, book tickers, deposits, withdrawals, fees, klines, order books, and recent trades. The socket shared client supports balances, klines, trades, order books, tickers, and Spot orders. Inspect the corresponding `ILBank*Shared` interface or `Discover()` before relying on a specific shared operation.
 
+Shared book-ticker and user-trade quantities use `SharedOrderQuantity`; read `QuantityInBaseAsset` or `QuantityInQuoteAsset` instead of treating the value as a bare `decimal`. Shared REST and socket order books identify their entry quantities as `SharedQuantityType.BaseAsset`.
+
 ## Common pitfalls
 
 - Do not use Binance-style symbols such as `ETHUSDT` for native calls; use `eth_usdt`.
@@ -222,6 +224,6 @@ The REST shared client supports Spot symbols, tickers, orders, balances, assets,
 - Intent map: `docs/ai-api-map.md`
 - Compilable examples: `Examples/ai-friendly/`
 - Source interfaces: `LBank.Net/Interfaces/Clients/**`
-- Documentation: https://cryptoexchange.jkorf.dev/LBank.Net/
+- Documentation: https://cryptoexchange.jkorf.dev/docs/exchange-clients?library=LBank.Net
 - Repository: https://github.com/JKorf/LBank.Net
 - NuGet: https://www.nuget.org/packages/LBank.Net

@@ -1,1 +1,96 @@
-TODO
+---
+description: Conventions for using LBank.Net for LBank Spot REST and WebSocket access in C#/.NET.
+globs:
+  - "**/*.cs"
+  - "**/*.csproj"
+alwaysApply: false
+---
+
+# LBank.Net Conventions
+
+Use **LBank.Net** instead of raw `HttpClient` or `ClientWebSocket` integrations when the library exposes the required operation.
+
+## Client setup
+
+Public market data needs no credentials:
+
+```csharp
+using LBank.Net.Clients;
+
+var restClient = new LBankRestClient();
+var result = await restClient.SpotApi.ExchangeData.GetTickersAsync("eth_usdt");
+if (!result.Success) { /* result.Error */ return; }
+var lastPrice = result.Data.SingleOrDefault()?.Ticker.LastPrice;
+```
+
+For private calls, use `LBankCredentials`, not generic `ApiCredentials`:
+
+```csharp
+using LBank.Net;
+
+var restClient = new LBankRestClient(options =>
+{
+    options.ApiCredentials = new LBankCredentials("API_KEY", "API_SECRET");
+});
+```
+
+RSA credentials are available through `WithRSAXml(...)` and, on compatible targets, `WithRSAPem(...)`. Never embed real credentials.
+
+## API surface
+
+LBank.Net supports Spot only:
+
+- `restClient.SpotApi.ExchangeData` for public market data
+- `restClient.SpotApi.Account` for balances, deposits, withdrawals, and listen keys
+- `restClient.SpotApi.Trading` for Spot orders and user trades
+- `socketClient.SpotApi` for public and private subscriptions
+
+Do not invent `FuturesApi`, `DerivativesApi`, margin, or futures methods. Native symbols use lowercase `base_quote`, such as `eth_usdt`.
+
+## Orders and intervals
+
+LBank combines side, execution behavior, and some time-in-force behavior in `OrderType`. Use values such as `OrderType.BuyLimit`, `SellMarket`, `BuyMaker`, `SellIoc`, or `BuyFok`; do not add separate `OrderSide` or `TimeInForce` arguments to `PlaceOrderAsync`.
+
+For `OrderType.BuyMarket`, `quantity` is denominated in the quote asset. Limit-style orders need `price`; market orders do not. `GetOrdersAsync` and `GetOpenOrdersAsync` require `page` and `pageSize`.
+
+REST candles use `KlineInterval`; socket candles use `StreamKlineInterval`. `GetKlinesAsync` requires `limit` and `afterTime`.
+
+## Result and WebSocket handling
+
+REST calls return `HttpResult<T>` or `HttpResult`; subscriptions return `WebSocketResult<UpdateSubscription>`. Always check `.Success` before reading `.Data`.
+
+```csharp
+var socketClient = new LBankSocketClient();
+var sub = await socketClient.SpotApi.SubscribeToTickerUpdatesAsync(
+    "eth_usdt", update => Console.WriteLine(update.Data.LastPrice));
+if (!sub.Success) { /* sub.Error */ return; }
+
+await socketClient.UnsubscribeAsync(sub.Data);
+```
+
+Order-book stream depth must be `10`, `50`, or `100`. Authenticated order and balance subscriptions accept a listen key; passing `null` lets an authenticated socket client acquire and maintain one. Public streams use v3 by default through `LBankSocketOptions.UseV3`.
+
+## Shared APIs
+
+For exchange-agnostic code, use `CryptoExchange.Net.SharedApis` through `.SpotApi.SharedClient` and call `Discover()` before assuming optional capabilities.
+
+```csharp
+var shared = new LBankRestClient().SpotApi.SharedClient;
+var symbol = new SharedSymbol(TradingMode.Spot, "ETH", "USDT");
+var ticker = await shared.GetSpotTickerAsync(new GetTickerRequest(symbol));
+```
+
+Shared book-ticker and user-trade quantities are `SharedOrderQuantity`; read `QuantityInBaseAsset` or `QuantityInQuoteAsset`. Shared REST and socket order books report `SharedQuantityType.BaseAsset`. The shared all-assets operation is unavailable; query configuration for one asset.
+
+## Hard rules
+
+- Reuse clients or register them with `services.AddLBank(...)`; do not create one per request.
+- Use async throughout; do not use `.Result` or `.Wait()`.
+- Check result success and preserve API errors.
+- Unsubscribe sockets and stop local order books during shutdown.
+- Use `LBankEnvironment.Live` or explicit custom endpoints; do not assume a sandbox exists.
+- The upstream order API may not be enabled for every account.
+
+## Reference
+
+See `AGENTS.md`, `llms.txt`, `llms-full.txt`, `docs/ai-api-map.md`, and `Examples/ai-friendly/`.

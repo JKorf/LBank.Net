@@ -4,9 +4,9 @@
 
 LBank.Net is a strongly typed client library for the LBank Spot REST and WebSocket APIs. It is based on CryptoExchange.Net and provides typed models and enums, result wrappers, authentication, client-side rate limiting, automatic socket reconnection, dependency injection, shared multi-exchange interfaces, synchronized local order books, trackers, logging, and native AOT support.
 
-Current repository package version: 1.0.2.
+Current repository package version: 1.1.0.
 Package ID: `LBank.Net`.
-CryptoExchange.Net dependency: 12.4.0.
+CryptoExchange.Net dependency: 12.5.0.
 Target frameworks: netstandard2.0, netstandard2.1, net8.0, net9.0, net10.0.
 Native AOT: enabled on compatible target frameworks.
 
@@ -16,7 +16,7 @@ Primary references:
 - `docs/ai-api-map.md`: intent-to-method quick map
 - `Examples/ai-friendly/`: compilable workflow examples
 - `LBank.Net/Interfaces/Clients/**`: authoritative endpoint interfaces
-- https://cryptoexchange.jkorf.dev/LBank.Net/: generated library documentation
+- https://cryptoexchange.jkorf.dev/docs/exchange-clients?library=LBank.Net: client guide and API reference
 - https://www.lbank.com/docs/: upstream API documentation
 
 ## Golden rules for code generation
@@ -561,6 +561,8 @@ ISpotOrderSocketClient
 ```
 
 Call `Discover()` or inspect operation options before assuming optional capabilities. Specifically, LBank supports getting configuration for one asset but does not expose an API to retrieve the complete asset list, so the shared all-assets operation is unavailable.
+
+With CryptoExchange.Net 12.5.0, quantity-bearing shared results use explicit quantity metadata. Shared book-ticker and REST user-trade quantities are `SharedOrderQuantity` values; read `QuantityInBaseAsset` and, when supplied, `QuantityInQuoteAsset`. User trades emitted with private socket order updates supply the base quantity. Shared REST and socket order books set `SharedOrderBook.QuantityType` to `SharedQuantityType.BaseAsset`, so each entry quantity is denominated in the symbol's base asset.
 
 ## Environments
 

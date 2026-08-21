@@ -234,6 +234,9 @@ Make a one time donation in a crypto currency of your choice. If you prefer to d
 Alternatively, sponsor me on Github using [Github Sponsors](https://github.com/sponsors/JKorf). 
 
 ## Release notes
+* Version 1.1.0 - 21 Aug 2026
+    * Updated to CryptoExchange.Net v12.5.0
+
 * Version 1.0.2 - 07 Aug 2026
     * Added OrderSide mapping
     * Fixed Shared websocket trade updates not being in UTC
