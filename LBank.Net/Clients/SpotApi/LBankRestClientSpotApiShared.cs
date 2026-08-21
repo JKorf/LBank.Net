@@ -105,9 +105,9 @@ namespace LBank.Net.Clients.SpotApi
                 ExchangeSymbolCache.ParseSymbol(_topicId, EnvironmentName, null, ticker.Symbol),
                 ticker.Symbol,
                 ticker.BestAskPrice,
-                ticker.BestAskQuantity,
+                new SharedOrderQuantity(ticker.BestAskQuantity),
                 ticker.BestBidPrice,
-                ticker.BestBidQuantity));
+                new SharedOrderQuantity(ticker.BestBidQuantity)));
         }
 
         #endregion
@@ -301,7 +301,7 @@ namespace LBank.Net.Clients.SpotApi
             if (!result.Success)
                 return HttpResult.Fail<SharedOrderBook>(result);
 
-            return HttpResult.Ok(result, new SharedOrderBook(result.Data.Asks, result.Data.Bids));
+            return HttpResult.Ok(result, new SharedOrderBook(SharedQuantityType.BaseAsset, result.Data.Asks, result.Data.Bids));
         }
 
         #endregion
@@ -826,7 +826,7 @@ namespace LBank.Net.Clients.SpotApi
                 x.OrderId.ToString(),
                 x.Id.ToString(),
                 x.IsBuyer ? SharedOrderSide.Buy : SharedOrderSide.Sell,
-                x.Quantity,
+                new SharedOrderQuantity(x.Quantity, x.QuoteQuantity),
                 x.Price,
                 x.Timestamp)
             {
@@ -877,7 +877,7 @@ namespace LBank.Net.Clients.SpotApi
                         x.OrderId.ToString(),
                         x.Id.ToString(),
                         x.IsBuyer ? SharedOrderSide.Buy : SharedOrderSide.Sell,
-                        x.Quantity,
+                        new SharedOrderQuantity(x.Quantity, x.QuoteQuantity),
                         x.Price,
                         x.Timestamp)
                     {

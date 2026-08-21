@@ -113,7 +113,9 @@ namespace LBank.Net.Clients.SpotApi
                 return WebSocketResult.Fail<UpdateSubscription>(_exchangeName, validationError);
 
             var symbol = request.SymbolName(FormatSymbol);
-            var result = await SubscribeToOrderBookUpdatesAsync(symbol, request.Limit ?? 50, update => handler(update.ToType(new SharedOrderBook(update.Data.Asks, update.Data.Bids))), ct).ConfigureAwait(false);
+            var result = await SubscribeToOrderBookUpdatesAsync(symbol, request.Limit ?? 50, update => handler(
+                update.ToType(
+                    new SharedOrderBook(SharedQuantityType.BaseAsset, update.Data.Asks, update.Data.Bids))), ct).ConfigureAwait(false);
             return result;
         }
         #endregion
@@ -179,7 +181,7 @@ namespace LBank.Net.Clients.SpotApi
                                     update.Data.OrderId,
                                     update.Data.TradeId,
                                     side,
-                                    update.Data.Quantity!.Value,
+                                    new SharedOrderQuantity(update.Data.Quantity!.Value),
                                     update.Data.Price!.Value,
                                     update.Data.UpdateTime
                                     )
