@@ -9,7 +9,7 @@
              "change":2.54,
              "usd":299.12,
              "to_usd":11083.66,
-             "dir":"sell",
+             "dir":"buy_ioc",
              "turnover":13224.0186,
              "latest":0.02698749,
              "cny":2068.41
