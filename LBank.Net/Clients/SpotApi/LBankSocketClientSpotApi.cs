@@ -30,6 +30,8 @@ namespace LBank.Net.Clients.SpotApi
     internal partial class LBankSocketClientSpotApi : SocketApiClient<LBankEnvironment, LBankAuthenticationProvider, LBankCredentials>, ILBankSocketClientSpotApi
     {
         #region fields
+        private readonly LBankSocketClientSpotSharedApi _sharedApi;
+
         protected override ErrorMapping ErrorMapping => LBankErrors.Errors;
 
         private readonly ILoggerFactory? _loggerFactory;
@@ -71,6 +73,8 @@ namespace LBank.Net.Clients.SpotApi
             RateLimiter = LBankExchange.RateLimiter.RestApi;
 
             AddSystemSubscription(new LBankPingSubscription(_logger));
+
+            _sharedApi = new LBankSocketClientSpotSharedApi(this);
 
             // Server doesn't respond consistently to ping frames
             // KeepAliveInterval = TimeSpan.Zero;
@@ -295,7 +299,9 @@ namespace LBank.Net.Clients.SpotApi
         }
 
         /// <inheritdoc />
-        public ILBankSocketClientSpotApiShared SharedClient => this;
+        public ILBankSocketClientSpotApiShared SharedClient => _sharedApi;
+        /// <inheritdoc />
+        public ILBankSocketClientSpotSharedApi SharedApi => _sharedApi;
 
         /// <inheritdoc />
         public override string FormatSymbol(string baseAsset, string quoteAsset, TradingMode tradingMode, DateTime? deliverDate = null)
