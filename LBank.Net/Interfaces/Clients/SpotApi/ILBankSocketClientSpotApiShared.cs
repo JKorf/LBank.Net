@@ -21,11 +21,11 @@ namespace LBank.Net.Interfaces.Clients.SpotApi
     /// exchange client libraries.
     /// </summary>
     public interface ILBankSocketClientSpotSharedApi :
-        ISubscribeBalancesOperation,
-        ISubscribeKlinesOperation,
-        ISubscribeTradesOperation,
-        ISubscribeOrderBookOperation,
-        ISubscribeTickerOperation,
-        ISubscribeSpotOrdersOperation
+        ISubscribeBalancesSocket,
+        ISubscribeKlinesSocket,
+        ISubscribeTradesSocket,
+        ISubscribeOrderBookSocket,
+        ISubscribeTickerSocket,
+        ISubscribeSpotOrdersSocket
     { }
 }

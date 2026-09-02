@@ -27,11 +27,11 @@ namespace LBank.Net.Interfaces.Clients.SpotApi
         public ILBankRestClientSpotApiTrading Trading { get; }
 
         /// <summary>
-        /// Get the shared rest requests client. For new implementations prefer <see cref="SharedApi"/>
+        /// [V1] Get the shared rest requests client. For new implementations prefer <see cref="SharedApi"/>
         /// </summary>
         public ILBankRestClientSpotApiShared SharedClient { get; }
         /// <summary>
-        /// Gets the aggregate Shared API interface. Shared APIs provide a common,
+        /// [V2] Gets the aggregate Shared API interface. Shared APIs provide a common,
         /// exchange-independent contract for accessing functionality across different
         /// exchange client libraries.
         /// </summary>
