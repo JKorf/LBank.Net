@@ -13,7 +13,8 @@ namespace LBank.Net.Clients.SpotApi
 {
     internal partial class LBankSocketClientSpotSharedApi
     {
-        #region Kline client
+        #region Subscribe Klines
+
         public SubscribeKlineOptions SubscribeKlineOptions { get; } = new SubscribeKlineOptions(_exchangeName, false,
             SharedKlineInterval.OneMinute,
             SharedKlineInterval.FiveMinutes,
@@ -48,6 +49,7 @@ namespace LBank.Net.Clients.SpotApi
                     new SharedOrderQuantity(update.Data.Volume, update.Data.Turnover)))), ct).ConfigureAwait(false);
             return result;
         }
+
         #endregion
     }
 }

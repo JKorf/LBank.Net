@@ -108,6 +108,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ILBankOrderBookFactory, LBankOrderBookFactory>();
             services.AddTransient<ITrackerFactory, LBankTrackerFactory>();
             services.AddTransient<ILBankTrackerFactory, LBankTrackerFactory>();
+            services.AddTransient<ILBankSharedApiClient, LBankSharedApiClient>();
             services.AddSingleton<ILBankUserClientProvider, LBankUserClientProvider>(x =>
                 new LBankUserClientProvider(
                     x.GetRequiredService<IHttpClientFactory>().CreateClient(typeof(ILBankRestClient).Name),
@@ -118,6 +119,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.RegisterSharedRestInterfaces(x => x.GetRequiredService<ILBankRestClient>().SpotApi.SharedClient);
             services.RegisterSharedSocketInterfaces(x => x.GetRequiredService<ILBankSocketClient>().SpotApi.SharedClient);
 
+            services.RegisterSharedApi(x => x.GetRequiredService<ILBankRestClient>().SpotApi.SharedApi);
+            services.RegisterSharedApi(x => x.GetRequiredService<ILBankSocketClient>().SpotApi.SharedApi);
 
             return services;
         }

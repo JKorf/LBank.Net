@@ -15,7 +15,10 @@ namespace LBank.Net.Clients.SpotApi
 {
     internal partial class LBankRestClientSpotSharedApi
     {
-        #region Ticker client
+        #region Get Spot Ticker
+
+        async Task<ICallResult<SharedSpotTicker>> IGetSpotTicker.GetSpotTickerAsync(GetTickerRequest request, CancellationToken ct)
+            => await GetSpotTickerAsync(request, ct).ConfigureAwait(false);
 
         public GetSpotTickerOptions GetSpotTickerOptions { get; } = new GetSpotTickerOptions(_exchangeName);
         public async Task<HttpResult<SharedSpotTicker>> GetSpotTickerAsync(GetTickerRequest request, CancellationToken ct)
@@ -33,7 +36,6 @@ namespace LBank.Net.Clients.SpotApi
             if (ticker == null)
                 return HttpResult.Fail<SharedSpotTicker>(Exchange, new ServerError(ErrorType.UnknownSymbol, $"No ticker found for symbol {request.Symbol}"));
 
-
             return HttpResult.Ok(result, new SharedSpotTicker(
                 ExchangeSymbolCache.ParseSymbol(_topicId, _api.EnvironmentName, null, symbol),
                 symbol,
@@ -45,6 +47,13 @@ namespace LBank.Net.Clients.SpotApi
             {
             });
         }
+
+        #endregion
+
+        #region Get All Spot Tickers
+
+        async Task<ICallResult<SharedSpotTicker[]>> IGetAllSpotTickers.GetAllSpotTickersAsync(GetTickersRequest request, CancellationToken ct)
+            => await GetAllSpotTickersAsync(request, ct).ConfigureAwait(false);
 
         Task<HttpResult<SharedSpotTicker[]>> ISpotTickerRestClient.GetSpotTickersAsync(GetTickersRequest request, CancellationToken ct)
             => GetAllSpotTickersAsync(request, ct);
@@ -75,5 +84,6 @@ namespace LBank.Net.Clients.SpotApi
         }
 
         #endregion
+
     }
 }

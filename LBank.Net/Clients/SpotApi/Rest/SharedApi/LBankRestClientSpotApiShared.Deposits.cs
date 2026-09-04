@@ -15,7 +15,10 @@ namespace LBank.Net.Clients.SpotApi
 {
     internal partial class LBankRestClientSpotSharedApi
     {
-        #region Deposit client
+        #region Get Deposit Addresses
+
+        async Task<ICallResult<SharedDepositAddress[]>> IGetDepositAddresses.GetDepositAddressesAsync(GetDepositAddressesRequest request, CancellationToken ct)
+            => await GetDepositAddressesAsync(request, ct).ConfigureAwait(false);
 
         public GetDepositAddressesOptions GetDepositAddressesOptions { get; } = new GetDepositAddressesOptions(_exchangeName, true);
         public async Task<HttpResult<SharedDepositAddress[]>> GetDepositAddressesAsync(GetDepositAddressesRequest request, CancellationToken ct)
@@ -34,6 +37,13 @@ namespace LBank.Net.Clients.SpotApi
                 Network = request.Network
             }]);
         }
+
+        #endregion
+
+        #region Get Deposit History
+
+        async Task<ICallResult<SharedDeposit[]>> IGetDepositHistory.GetDepositHistoryAsync(GetDepositsRequest request, PageRequest? pageRequest, CancellationToken ct)
+            => await GetDepositHistoryAsync(request, pageRequest, ct).ConfigureAwait(false);
 
         Task<HttpResult<SharedDeposit[]>> IDepositRestClient.GetDepositsAsync(GetDepositsRequest request, PageRequest? pageRequest, CancellationToken ct)
             => GetDepositHistoryAsync(request, pageRequest, ct);
@@ -87,6 +97,8 @@ namespace LBank.Net.Clients.SpotApi
                     }).ToArray(), nextPageRequest);
         }
 
+        #endregion
+
         private SharedTransferStatus ParseTransferStatus(DepositStatus status)
         {
             if (status == DepositStatus.Success)
@@ -104,6 +116,5 @@ namespace LBank.Net.Clients.SpotApi
             return SharedTransferStatus.Unknown;
         }
 
-        #endregion
     }
 }

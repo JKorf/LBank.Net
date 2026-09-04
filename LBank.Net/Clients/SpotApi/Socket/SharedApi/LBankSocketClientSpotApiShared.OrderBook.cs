@@ -13,7 +13,8 @@ namespace LBank.Net.Clients.SpotApi
 {
     internal partial class LBankSocketClientSpotSharedApi
     {
-        #region Order Book client
+        #region Subscribe Order Book
+
         public SubscribeOrderBookOptions SubscribeOrderBookOptions { get; } = new SubscribeOrderBookOptions(_exchangeName, false, new[] { 10, 50, 100 });
         public async Task<WebSocketResult<UpdateSubscription>> SubscribeToOrderBookUpdatesAsync(SubscribeOrderBookRequest request, Action<DataEvent<SharedOrderBook>> handler, CancellationToken ct)
         {
@@ -27,6 +28,7 @@ namespace LBank.Net.Clients.SpotApi
                     new SharedOrderBook(SharedQuantityType.BaseAsset, null, update.Data.Asks, update.Data.Bids))), ct).ConfigureAwait(false);
             return result;
         }
+
         #endregion
     }
 }

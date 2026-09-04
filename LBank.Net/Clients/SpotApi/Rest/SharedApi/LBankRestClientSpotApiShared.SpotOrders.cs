@@ -15,7 +15,10 @@ namespace LBank.Net.Clients.SpotApi
 {
     internal partial class LBankRestClientSpotSharedApi
     {
-        #region Spot Order client
+        #region Place Spot Order
+
+        async Task<ICallResult<SharedId>> IPlaceSpotOrder.PlaceSpotOrderAsync(PlaceSpotOrderRequest request, CancellationToken ct)
+            => await PlaceSpotOrderAsync(request, ct).ConfigureAwait(false);
 
         public SharedFeeDeductionType SpotFeeDeductionType => SharedFeeDeductionType.DeductFromOutput;
         public SharedFeeAssetType SpotFeeAssetType => SharedFeeAssetType.QuoteAsset;
@@ -52,6 +55,8 @@ namespace LBank.Net.Clients.SpotApi
             return HttpResult.Ok(result, new SharedId(result.Data.OrderId));
         }
 
+        #endregion
+
         private OrderType DetermineOrderType(PlaceSpotOrderRequest request)
         {
             if (request.OrderType == SharedOrderType.Market)
@@ -68,6 +73,11 @@ namespace LBank.Net.Clients.SpotApi
 
             return request.Side == SharedOrderSide.Buy ? OrderType.BuyLimit : OrderType.SellLimit;
         }
+
+        #region Get Spot Order
+
+        async Task<ICallResult<SharedSpotOrder>> IGetSpotOrder.GetSpotOrderAsync(GetOrderRequest request, CancellationToken ct)
+            => await GetSpotOrderAsync(request, ct).ConfigureAwait(false);
 
         public GetSpotOrderOptions GetSpotOrderOptions { get; } = new GetSpotOrderOptions(_exchangeName, true);
         public async Task<HttpResult<SharedSpotOrder>> GetSpotOrderAsync(GetOrderRequest request, CancellationToken ct)
@@ -99,6 +109,8 @@ namespace LBank.Net.Clients.SpotApi
             });
         }
 
+        #endregion
+
         private (SharedOrderSide side, SharedOrderType type) ParseOrderType(OrderType type)
             => type switch
             {
@@ -110,6 +122,11 @@ namespace LBank.Net.Clients.SpotApi
                 OrderType.SellMaker => (SharedOrderSide.Sell, SharedOrderType.LimitMaker),
                 _ => (SharedOrderSide.Sell, SharedOrderType.Limit)
             };
+
+        #region Get Open Spot Orders
+
+        async Task<ICallResult<SharedSpotOrder[]>> IGetOpenSpotOrders.GetOpenSpotOrdersAsync(GetOpenOrdersRequest request, CancellationToken ct)
+            => await GetOpenSpotOrdersAsync(request, ct).ConfigureAwait(false);
 
         public GetOpenSpotOrdersOptions GetOpenSpotOrdersOptions { get; } = new GetOpenSpotOrdersOptions(_exchangeName, true)
         {
@@ -149,6 +166,13 @@ namespace LBank.Net.Clients.SpotApi
                 };
             }).ToArray());
         }
+
+        #endregion
+
+        #region Get Closed Spot Orders
+
+        async Task<ICallResult<SharedSpotOrder[]>> IGetClosedSpotOrders.GetClosedSpotOrdersAsync(GetClosedOrdersRequest request, PageRequest? pageRequest, CancellationToken ct)
+            => await GetClosedSpotOrdersAsync(request, pageRequest, ct).ConfigureAwait(false);
 
         public GetSpotClosedOrdersOptions GetClosedSpotOrdersOptions { get; } = new GetSpotClosedOrdersOptions(_exchangeName, false, true, false, 200)
         {
@@ -207,6 +231,13 @@ namespace LBank.Net.Clients.SpotApi
                 .ToArray(), nextPageRequest);
         }
 
+        #endregion
+
+        #region Get Spot Order Trades
+
+        async Task<ICallResult<SharedUserTrade[]>> IGetSpotOrderTrades.GetSpotOrderTradesAsync(GetOrderTradesRequest request, CancellationToken ct)
+            => await GetSpotOrderTradesAsync(request, ct).ConfigureAwait(false);
+
         public GetSpotOrderTradesOptions GetSpotOrderTradesOptions { get; } = new GetSpotOrderTradesOptions(_exchangeName, true)
         {
             RequestNotes = "API does not allow filtering by order id, so trades are only found if they;re in the 100 most recent trades"
@@ -237,6 +268,12 @@ namespace LBank.Net.Clients.SpotApi
             }).ToArray());
         }
 
+        #endregion
+
+        #region Get Spot User Trade History
+
+        async Task<ICallResult<SharedUserTrade[]>> IGetSpotUserTradeHistory.GetSpotUserTradeHistoryAsync(GetUserTradesRequest request, PageRequest? pageRequest, CancellationToken ct)
+            => await GetSpotUserTradeHistoryAsync(request, pageRequest, ct).ConfigureAwait(false);
 
         Task<HttpResult<SharedUserTrade[]>> ISpotOrderRestClient.GetSpotUserTradesAsync(GetUserTradesRequest request, PageRequest? pageRequest, CancellationToken ct)
             => GetSpotUserTradeHistoryAsync(request, pageRequest, ct);
@@ -294,6 +331,13 @@ namespace LBank.Net.Clients.SpotApi
                 .ToArray(), nextPageRequest);
         }
 
+        #endregion
+
+        #region Cancel Spot Order
+
+        async Task<ICallResult<SharedId>> ICancelSpotOrder.CancelSpotOrderAsync(CancelOrderRequest request, CancellationToken ct)
+            => await CancelSpotOrderAsync(request, ct).ConfigureAwait(false);
+
         public CancelSpotOrderOptions CancelSpotOrderOptions { get; } = new CancelSpotOrderOptions(_exchangeName, true);
         public async Task<HttpResult<SharedId>> CancelSpotOrderAsync(CancelOrderRequest request, CancellationToken ct)
         {
@@ -307,6 +351,8 @@ namespace LBank.Net.Clients.SpotApi
 
             return HttpResult.Ok(order, new SharedId(request.OrderId));
         }
+
+        #endregion
 
         private SharedOrderStatus ParseOrderStatus(OrderStatus status)
         {
@@ -328,9 +374,11 @@ namespace LBank.Net.Clients.SpotApi
 
             return null;
         }
-        #endregion
 
-        #region Spot Client Id Order Client
+        #region Get Spot Order By Client Order Id
+
+        async Task<ICallResult<SharedSpotOrder>> IGetSpotOrderByClientOrderId.GetSpotOrderByClientOrderIdAsync(GetOrderRequest request, CancellationToken ct)
+            => await GetSpotOrderByClientOrderIdAsync(request, ct).ConfigureAwait(false);
 
         public GetSpotOrderByClientOrderIdOptions GetSpotOrderByClientOrderIdOptions { get; } = new GetSpotOrderByClientOrderIdOptions(_exchangeName, true);
         public async Task<HttpResult<SharedSpotOrder>> GetSpotOrderByClientOrderIdAsync(GetOrderRequest request, CancellationToken ct)
@@ -362,6 +410,13 @@ namespace LBank.Net.Clients.SpotApi
             });
         }
 
+        #endregion
+
+        #region Cancel Spot Order By Client Order Id
+
+        async Task<ICallResult<SharedId>> ICancelSpotOrderByClientOrderId.CancelSpotOrderByClientOrderIdAsync(CancelOrderRequest request, CancellationToken ct)
+            => await CancelSpotOrderByClientOrderIdAsync(request, ct).ConfigureAwait(false);
+
         public CancelSpotOrderByClientOrderIdOptions CancelSpotOrderByClientOrderIdOptions { get; } = new CancelSpotOrderByClientOrderIdOptions(_exchangeName, true);
         public async Task<HttpResult<SharedId>> CancelSpotOrderByClientOrderIdAsync(CancelOrderRequest request, CancellationToken ct)
         {
@@ -375,6 +430,7 @@ namespace LBank.Net.Clients.SpotApi
 
             return HttpResult.Ok(order, new SharedId(request.OrderId));
         }
+
         #endregion
     }
 }

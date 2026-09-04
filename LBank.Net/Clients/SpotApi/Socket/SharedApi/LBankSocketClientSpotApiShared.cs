@@ -25,6 +25,7 @@ namespace LBank.Net.Clients.SpotApi
 
         public LBankSocketClientSpotSharedApi(LBankSocketClientSpotApi api)
             : base(
+                  SharedTransport.Socket,
                   api.Exchange,
                   [TradingMode.Spot],
                   () => api.Authenticated,

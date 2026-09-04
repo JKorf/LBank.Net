@@ -13,7 +13,7 @@ namespace LBank.Net.Clients.SpotApi
 {
     internal partial class LBankSocketClientSpotSharedApi
     {
-        #region Spot Order client
+        #region Subscribe Spot Orders
 
         async Task<WebSocketResult<UpdateSubscription>> ISpotOrderSocketClient.SubscribeToSpotOrderUpdatesAsync(SubscribeSpotOrderRequest request, Action<DataEvent<SharedSpotOrder[]>> handler, CancellationToken ct)
             => await SubscribeToSpotOrderUpdatesAsync(request, x => handler(x.ToType<SharedSpotOrder[]>(x.Data)), ct).ConfigureAwait(false);
@@ -64,6 +64,8 @@ namespace LBank.Net.Clients.SpotApi
             return result;
         }
 
+        #endregion
+
         private SharedOrderQuantity ParseQuantity(LBankOrderUpdate order)
         {
             if (order.OrderQuantity == 0)
@@ -109,6 +111,5 @@ namespace LBank.Net.Clients.SpotApi
 
             return SharedOrderStatus.Unknown;
         }
-        #endregion
     }
 }

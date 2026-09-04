@@ -15,7 +15,10 @@ namespace LBank.Net.Clients.SpotApi
 {
     internal partial class LBankRestClientSpotSharedApi
     {
-        #region Kline client
+        #region Get Klines
+
+        async Task<ICallResult<SharedKline[]>> IGetKlines.GetKlinesAsync(GetKlinesRequest request, PageRequest? pageRequest, CancellationToken ct)
+            => await GetKlinesAsync(request, pageRequest, ct).ConfigureAwait(false);
 
         public GetKlinesOptions GetKlinesOptions { get; } = new GetKlinesOptions(_exchangeName, true, false, true, 2000, false,
             SharedKlineInterval.OneMinute,
@@ -76,5 +79,6 @@ namespace LBank.Net.Clients.SpotApi
         }
 
         #endregion
+
     }
 }

@@ -15,7 +15,10 @@ namespace LBank.Net.Clients.SpotApi
 {
     internal partial class LBankRestClientSpotSharedApi
     {
-        #region Asset client
+        #region Get Asset
+
+        async Task<ICallResult<SharedAsset>> IGetAsset.GetAssetAsync(GetAssetRequest request, CancellationToken ct)
+            => await GetAssetAsync(request, ct).ConfigureAwait(false);
 
         public GetAssetOptions GetAssetOptions { get; } = new GetAssetOptions(_exchangeName, false);
         public async Task<HttpResult<SharedAsset>> GetAssetAsync(GetAssetRequest request, CancellationToken ct)
@@ -41,6 +44,8 @@ namespace LBank.Net.Clients.SpotApi
             });
         }
 
+        #endregion
+
         GetAllAssetsOptions IAssetsRestClient.GetAssetsOptions { get; } = new GetAllAssetsOptions(_exchangeName, false)
         {
             Supported = false,
@@ -51,6 +56,5 @@ namespace LBank.Net.Clients.SpotApi
             return Task.FromResult(HttpResult.Fail<SharedAsset[]>(Exchange, new InvalidOperationError($"Method not available for {Exchange}")));
         }
 
-        #endregion
     }
 }

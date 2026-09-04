@@ -13,7 +13,8 @@ namespace LBank.Net.Clients.SpotApi
 {
     internal partial class LBankSocketClientSpotSharedApi
     {
-        #region Balance client
+        #region Subscribe Balances
+
         public SubscribeBalanceOptions SubscribeBalanceOptions { get; } = new SubscribeBalanceOptions(_exchangeName, true);
         public async Task<WebSocketResult<UpdateSubscription>> SubscribeToBalanceUpdatesAsync(SubscribeBalancesRequest request, Action<DataEvent<SharedBalance[]>> handler, CancellationToken ct)
         {
@@ -32,6 +33,7 @@ namespace LBank.Net.Clients.SpotApi
                 ct: ct).ConfigureAwait(false);
             return result;
         }
+
         #endregion
     }
 }
