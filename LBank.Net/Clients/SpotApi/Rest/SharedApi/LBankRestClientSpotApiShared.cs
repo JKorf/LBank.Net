@@ -39,7 +39,6 @@ namespace LBank.Net.Clients.SpotApi
 
             SetCapabilities(
                 GetAssetOptions,
-                GetAllSpotTickersOptions,
                 GetAssetOptions,
                 GetBalancesOptions,
                 GetBookTickerOptions,
@@ -52,8 +51,8 @@ namespace LBank.Net.Clients.SpotApi
                 GetWithdrawalHistoryOptions,
                 WithdrawOptions,
                 GetSpotSymbolsOptions,
-                GetSpotTickerOptions,
-                GetAllSpotTickersOptions,
+                GetTickerOptions,
+                GetAllTickersOptions,
                 PlaceSpotOrderOptions,
                 GetSpotOrderOptions,
                 GetOpenSpotOrdersOptions,

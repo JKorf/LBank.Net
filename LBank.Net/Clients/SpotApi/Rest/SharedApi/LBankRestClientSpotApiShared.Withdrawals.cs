@@ -104,8 +104,8 @@ namespace LBank.Net.Clients.SpotApi
 
         public WithdrawOptions WithdrawOptions { get; } = new WithdrawOptions(_exchangeName)
         {
-            RequiredExchangeParameters = [
-                new ParameterDescription("Fee", typeof(decimal), "The fee to use for the withdrawal", 0.001m)
+            ExchangeParameterRules = [
+                ExchangeParameterRule.Required("Fee", "The fee to use for the withdrawal", 0.001m)
                 ]
         };
 
