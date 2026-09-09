@@ -176,7 +176,11 @@ namespace LBank.Net.Clients.SpotApi
 
         public GetSpotClosedOrdersOptions GetClosedSpotOrdersOptions { get; } = new GetSpotClosedOrdersOptions(_exchangeName, false, true, false, 200)
         {
-            MaxAge = TimeSpan.FromDays(7)
+            MaxAge = TimeSpan.FromDays(7),
+            ParameterRuleOverwrites = [
+                RequestParameterRuleOverride<GetClosedOrdersRequest>.NotSupported(x => x.StartTime),
+                RequestParameterRuleOverride<GetClosedOrdersRequest>.NotSupported(x => x.EndTime)
+                ]
         };
         public async Task<HttpResult<SharedSpotOrder[]>> GetClosedSpotOrdersAsync(GetClosedOrdersRequest request, PageRequest? pageRequest, CancellationToken ct)
         {
