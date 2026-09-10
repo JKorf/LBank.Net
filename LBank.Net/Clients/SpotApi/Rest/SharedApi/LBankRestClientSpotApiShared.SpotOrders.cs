@@ -130,7 +130,7 @@ namespace LBank.Net.Clients.SpotApi
 
         public GetOpenSpotOrdersOptions GetOpenSpotOrdersOptions { get; } = new GetOpenSpotOrdersOptions(_exchangeName, true)
         {
-            ParameterRuleOverwrites = [
+            ParameterRuleOverrides = [
                 RequestParameterRuleOverride<GetOpenOrdersRequest>.Required(x => x.Symbol)
             ]
         };
@@ -177,7 +177,7 @@ namespace LBank.Net.Clients.SpotApi
         public GetSpotClosedOrdersOptions GetClosedSpotOrdersOptions { get; } = new GetSpotClosedOrdersOptions(_exchangeName, false, true, false, 200)
         {
             MaxAge = TimeSpan.FromDays(7),
-            ParameterRuleOverwrites = [
+            ParameterRuleOverrides = [
                 RequestParameterRuleOverride<GetClosedOrdersRequest>.NotSupported(x => x.StartTime),
                 RequestParameterRuleOverride<GetClosedOrdersRequest>.NotSupported(x => x.EndTime)
                 ]
