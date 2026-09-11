@@ -1,25 +1,32 @@
+using CryptoExchange.Net.SharedApis;
 using LBank.Net.Interfaces.Clients;
 using LBank.Net.Interfaces.Clients.SpotApi;
+using LBank.Net.Objects.Options;
+using Microsoft.Extensions.Options;
 
 namespace LBank.Net.Clients
 {
     /// <inheritdoc />
-    public class LBankSharedApiClient : ILBankSharedApiClient
+    public class LBankSharedApiClient : SharedApiClientBase, ILBankSharedApiClient
     {
         /// <inheritdoc />
-        public ILBankRestClientSpotSharedApi Rest { get; }
+        public ILBankRestClientSpotSharedApi SpotRest { get; }
         /// <inheritdoc />
-        public ILBankSocketClientSpotSharedApi Socket { get; }
+        public ILBankSocketClientSpotSharedApi SpotSocket { get; }
 
         /// <summary>
         /// ctor
         /// </summary>
         public LBankSharedApiClient(
             ILBankRestClient restClient,
-            ILBankSocketClient socketClient)
+            ILBankSocketClient socketClient,
+            IOptions<LBankOptions> options)
+            : base(options.Value.SharedApi.PreferredTransport,
+                  restClient.SpotApi.SharedApi,
+                  socketClient.SpotApi.SharedApi)
         {
-            Rest = restClient.SpotApi.SharedApi;
-            Socket = socketClient.SpotApi.SharedApi;
+            SpotRest = restClient.SpotApi.SharedApi;
+            SpotSocket = socketClient.SpotApi.SharedApi;
         }
     }
 }

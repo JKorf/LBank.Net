@@ -54,9 +54,9 @@ namespace Microsoft.Extensions.DependencyInjection
             options.Socket.Environment = LBankEnvironment.GetEnvironmentByName(socketEnvName) ?? options.Socket.Environment!;
             options.Socket.ApiCredentials = options.Socket.ApiCredentials ?? options.ApiCredentials;
 
-
-            services.AddSingleton(x => Options.Options.Create(options.Rest));
-            services.AddSingleton(x => Options.Options.Create(options.Socket));
+            services.AddSingleton(Options.Options.Create(options.Rest));
+            services.AddSingleton(Options.Options.Create(options.Socket));
+            services.AddSingleton(Options.Options.Create(options));
 
             return AddLBankCore(services, options.SocketClientLifeTime);
         }
@@ -84,8 +84,9 @@ namespace Microsoft.Extensions.DependencyInjection
             options.Socket.Environment = options.Socket.Environment ?? options.Environment ?? LBankEnvironment.Live;
             options.Socket.ApiCredentials = options.Socket.ApiCredentials ?? options.ApiCredentials;
 
-            services.AddSingleton(x => Options.Options.Create(options.Rest));
-            services.AddSingleton(x => Options.Options.Create(options.Socket));
+            services.AddSingleton(Options.Options.Create(options.Rest));
+            services.AddSingleton(Options.Options.Create(options.Socket));
+            services.AddSingleton(Options.Options.Create(options));
 
             return AddLBankCore(services, options.SocketClientLifeTime);
         }
@@ -108,7 +109,6 @@ namespace Microsoft.Extensions.DependencyInjection
             services.AddTransient<ILBankOrderBookFactory, LBankOrderBookFactory>();
             services.AddTransient<ITrackerFactory, LBankTrackerFactory>();
             services.AddTransient<ILBankTrackerFactory, LBankTrackerFactory>();
-            services.AddTransient<ILBankSharedApiClient, LBankSharedApiClient>();
             services.AddSingleton<ILBankUserClientProvider, LBankUserClientProvider>(x =>
                 new LBankUserClientProvider(
                     x.GetRequiredService<IHttpClientFactory>().CreateClient(typeof(ILBankRestClient).Name),
@@ -116,8 +116,12 @@ namespace Microsoft.Extensions.DependencyInjection
                     x.GetRequiredService<IOptions<LBankRestOptions>>(),
                     x.GetRequiredService<IOptions<LBankSocketOptions>>()));
 
+            services.AddTransient<ILBankSharedApiClient, LBankSharedApiClient>();
+
             services.RegisterSharedRestInterfaces(x => x.GetRequiredService<ILBankRestClient>().SpotApi.SharedClient);
             services.RegisterSharedSocketInterfaces(x => x.GetRequiredService<ILBankSocketClient>().SpotApi.SharedClient);
+
+            services.RegisterSharedApiClientCapabilities<ILBankSharedApiClient>();
 
             services.RegisterSharedApi(x => x.GetRequiredService<ILBankRestClient>().SpotApi.SharedApi);
             services.RegisterSharedApi(x => x.GetRequiredService<ILBankSocketClient>().SpotApi.SharedApi);
