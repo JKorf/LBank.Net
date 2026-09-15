@@ -1,17 +1,18 @@
 using CryptoExchange.Net;
 using CryptoExchange.Net.Interfaces;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
-using System.Net.Http;
-using System.Threading;
+using CryptoExchange.Net.SharedApis;
 using LBank.Net;
 using LBank.Net.Clients;
 using LBank.Net.Interfaces;
 using LBank.Net.Interfaces.Clients;
 using LBank.Net.Objects.Options;
 using LBank.Net.SymbolOrderBooks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using System;
+using System.Net.Http;
+using System.Threading;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -116,16 +117,15 @@ namespace Microsoft.Extensions.DependencyInjection
                     x.GetRequiredService<IOptions<LBankRestOptions>>(),
                     x.GetRequiredService<IOptions<LBankSocketOptions>>()));
 
-            services.AddTransient<ILBankSharedApiClient, LBankSharedApiClient>();
-
             services.RegisterSharedRestInterfaces(x => x.GetRequiredService<ILBankRestClient>().SpotApi.SharedClient);
             services.RegisterSharedSocketInterfaces(x => x.GetRequiredService<ILBankSocketClient>().SpotApi.SharedClient);
 
-            services.RegisterSharedApiClientCapabilities<ILBankSharedApiClient>();
-
-            services.RegisterSharedApi(x => x.GetRequiredService<ILBankRestClient>().SpotApi.SharedApi);
-            services.RegisterSharedApi(x => x.GetRequiredService<ILBankSocketClient>().SpotApi.SharedApi);
-
+            services.RegisterSharedApiClient<
+                ILBankSharedApiClient,
+                LBankSharedApiClient>(sharedApis => sharedApis
+                    .Add(client => client.SpotRest)
+                    .Add(client => client.SpotSocket)
+                    );
             return services;
         }
     }
