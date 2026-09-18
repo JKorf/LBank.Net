@@ -17,7 +17,7 @@ namespace LBank.Net.Clients.SpotApi
     {
         #region Get Asset
 
-        async Task<ICallResult<SharedAsset>> IGetAsset.GetAssetAsync(GetAssetRequest request, CancellationToken ct)
+        async Task<IExchangeCallResult<SharedAsset>> IGetAsset.GetAssetAsync(GetAssetRequest request, CancellationToken ct)
             => await GetAssetAsync(request, ct).ConfigureAwait(false);
 
         public GetAssetOptions GetAssetOptions { get; } = new GetAssetOptions(_exchangeName, false);
