@@ -72,12 +72,12 @@ Order-book stream depth must be `10`, `50`, or `100`. Authenticated order and ba
 
 ## Shared APIs
 
-For exchange-agnostic code, use `CryptoExchange.Net.SharedApis` through `.SpotApi.SharedClient` and call `Discover()` before assuming optional capabilities.
+Use the exchange-level `ILBankSharedApiClient` aggregate's `GetCapability(...)` or `GetCapabilities(...)` methods for runtime capability lookup; use an API surface's `.SharedApi` property when the transport and API are known.
 
 ```csharp
-var shared = new LBankRestClient().SpotApi.SharedClient;
+var shared = new LBankRestClient().SpotApi.SharedApi;
 var symbol = new SharedSymbol(TradingMode.Spot, "ETH", "USDT");
-var ticker = await shared.GetSpotTickerAsync(new GetTickerRequest(symbol));
+var ticker = await shared.GetTickerAsync(new GetTickerRequest(symbol));
 ```
 
 Shared book-ticker and user-trade quantities are `SharedOrderQuantity`; read `QuantityInBaseAsset` or `QuantityInQuoteAsset`. Shared REST and socket order books report `SharedQuantityType.BaseAsset`. The shared all-assets operation is unavailable; query configuration for one asset.
