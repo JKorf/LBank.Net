@@ -75,7 +75,7 @@ LBankRestClient
     .ExchangeData
     .Account
     .Trading
-    .SharedClient
+    .SharedApi
 
 LBankSocketClient
   .SpotApi
@@ -85,7 +85,7 @@ LBankSocketClient
     SubscribeToTickerUpdatesAsync(...)
     SubscribeToOrderUpdatesAsync(...)
     SubscribeToBalanceUpdatesAsync(...)
-    .SharedClient
+    .SharedApi
 ```
 
 The public interfaces are:
@@ -508,10 +508,10 @@ The user-data tracker combines shared account/order REST clients with shared bal
 REST shared client:
 
 ```csharp
-var shared = new LBankRestClient().SpotApi.SharedClient;
+var shared = new LBankRestClient().SpotApi.SharedApi;
 var symbol = new SharedSymbol(TradingMode.Spot, "ETH", "USDT");
 
-var result = await shared.GetSpotTickerAsync(
+var result = await shared.GetTickerAsync(
     new GetTickerRequest(symbol));
 ```
 
@@ -519,7 +519,7 @@ Socket shared client:
 
 ```csharp
 var socketClient = new LBankSocketClient();
-var shared = socketClient.SpotApi.SharedClient;
+var shared = socketClient.SpotApi.SharedApi;
 var symbol = new SharedSymbol(TradingMode.Spot, "ETH", "USDT");
 
 var sub = await shared.SubscribeToTickerUpdatesAsync(
@@ -533,34 +533,34 @@ if (sub.Success)
 The concrete shared REST interface implements:
 
 ```text
-IAssetsRestClient
-IBalanceRestClient
-IBookTickerRestClient
-IDepositRestClient
-IFeeRestClient
-IKlineRestClient
-IOrderBookRestClient
-IRecentTradeRestClient
-IWithdrawalRestClient
-IWithdrawRestClient
-ISpotSymbolRestClient
-ISpotTickerRestClient
-ISpotOrderRestClient
-ISpotOrderClientIdRestClient
+IGetAllAssetsRest
+IGetBalancesRest
+IGetBookTickerRest
+IGetDepositHistoryRest
+IGetFeesRest
+IGetKlinesRest
+IGetOrderBookRest
+IGetRecentTradesRest
+IGetWithdrawalHistoryRest
+IWithdrawRest
+IGetSpotSymbolsRest
+IGetTickerRest
+IPlaceSpotOrderRest
+IGetSpotOrderByClientOrderIdRest
 ```
 
 The concrete shared socket interface implements:
 
 ```text
-IBalanceSocketClient
-IKlineSocketClient
-ITradeSocketClient
-IOrderBookSocketClient
-ITickerSocketClient
-ISpotOrderSocketClient
+ISubscribeBalancesSocket
+ISubscribeKlinesSocket
+ISubscribeTradesSocket
+ISubscribeOrderBookSocket
+ISubscribeTickerSocket
+ISubscribeSpotOrdersSocket
 ```
 
-Call `Discover()` or inspect operation options before assuming optional capabilities. Specifically, LBank supports getting configuration for one asset but does not expose an API to retrieve the complete asset list, so the shared all-assets operation is unavailable.
+Use the exchange-level `ILBankSharedApiClient` aggregate's `GetCapability(...)` or `GetCapabilities(...)` methods for runtime capability lookup; use an API surface's `.SharedApi` property when the transport and API are known.
 
 With CryptoExchange.Net 12.5.0, quantity-bearing shared results use explicit quantity metadata. Shared book-ticker and REST user-trade quantities are `SharedOrderQuantity` values; read `QuantityInBaseAsset` and, when supplied, `QuantityInQuoteAsset`. User trades emitted with private socket order updates supply the base quantity. Shared REST and socket order books set `SharedOrderBook.QuantityType` to `SharedQuantityType.BaseAsset`, so each entry quantity is denominated in the symbol's base asset.
 

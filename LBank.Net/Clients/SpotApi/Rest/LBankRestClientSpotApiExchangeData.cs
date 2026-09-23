@@ -27,7 +27,9 @@ namespace LBank.Net.Clients.SpotApi
         /// <inheritdoc />
         public async Task<HttpResult<DateTime>> GetServerTimeAsync(CancellationToken ct = default)
         {
-            var request = _definitions.GetOrCreate(HttpMethod.Get, _baseClient.BaseAddress, "/v2/timestamp.do", LBankExchange.RateLimiter.RestApi, 1, false);
+            var request = _definitions.GetOrCreate(HttpMethod.Get, _baseClient.BaseAddress, "/v2/timestamp.do", LBankExchange.RateLimiter.RestApi, 1, false,
+                preventCaching: true,
+                preventRequestCoalescing: true);
             var result = await _baseClient.SendAsync<DateTime>(request, null, ct).ConfigureAwait(false);
             return result;
         }

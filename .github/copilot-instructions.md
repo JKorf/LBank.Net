@@ -49,7 +49,7 @@ Private order and balance subscriptions accept a listen key. Passing `null` lets
 
 ## Shared APIs
 
-Use `new LBankRestClient().SpotApi.SharedClient` or the socket equivalent for exchange-agnostic `CryptoExchange.Net.SharedApis` code. Call `Discover()` or inspect operation options before assuming support.
+Use the exchange-level `ILBankSharedApiClient` aggregate's `GetCapability(...)` or `GetCapabilities(...)` methods for runtime capability lookup; use an API surface's `.SharedApi` property when the transport and API are known.
 
 Shared book-ticker and user-trade quantities use `SharedOrderQuantity`; read `QuantityInBaseAsset` or `QuantityInQuoteAsset`. Shared REST and socket order books identify entry quantities as `SharedQuantityType.BaseAsset`. The shared all-assets operation is not supported; request configuration for a specified asset.
 

@@ -22,4 +22,36 @@ namespace LBank.Net.Interfaces.Clients.SpotApi
         ISpotOrderClientIdRestClient
     {
     }
+
+    /// <summary>
+    /// Shared API interface. Shared APIs provide a common,
+    /// exchange-independent contract for accessing functionality across different
+    /// exchange client libraries.
+    /// </summary>
+    public interface ILBankRestClientSpotSharedApi :
+        IGetAssetRest,
+        IGetBalancesRest,
+        IGetBookTickerRest,
+        IGetDepositAddressesRest,
+        IGetDepositHistoryRest,
+        IGetFeesRest,
+        IGetKlinesRest,
+        IGetOrderBookRest,
+        IGetRecentTradesRest,
+        IGetWithdrawalHistoryRest,
+        IWithdrawRest,
+        IGetSpotSymbolsRest,
+        IGetTickerRest,
+        IGetAllTickersRest,
+        IPlaceSpotOrderRest,
+        IGetSpotOrderRest,
+        IGetOpenSpotOrdersRest,
+        IGetClosedSpotOrdersRest,
+        IGetSpotOrderTradesRest,
+        IGetSpotUserTradeHistoryRest,
+        ICancelSpotOrderRest,
+        IGetSpotOrderByClientOrderIdRest,
+        ICancelSpotOrderByClientOrderIdRest
+    {
+    }
 }

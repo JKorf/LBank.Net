@@ -21,6 +21,8 @@ namespace LBank.Net.Clients.SpotApi
     internal partial class LBankRestClientSpotApi : RestApiClient<LBankEnvironment, LBankAuthenticationProvider, LBankCredentials>, ILBankRestClientSpotApi
     {
         #region fields 
+        private readonly LBankRestClientSpotSharedApi _sharedApi;
+
         protected override ErrorMapping ErrorMapping => LBankErrors.Errors;
 
         /// <inheritdoc />
@@ -43,6 +45,8 @@ namespace LBank.Net.Clients.SpotApi
             : base(loggerFactory, LBankExchange.Metadata.Id, httpClient, options.Environment.RestClientSpotAddress, options, options.SpotOptions)
         {
             RequestBodyFormat = RequestBodyFormat.FormData;
+
+            _sharedApi = new LBankRestClientSpotSharedApi(this);
 
             Account = new LBankRestClientSpotApiAccount(this);
             ExchangeData = new LBankRestClientSpotApiExchangeData(_logger, this);
@@ -97,6 +101,8 @@ namespace LBank.Net.Clients.SpotApi
             => LBankExchange.FormatSymbol(baseAsset, quoteAsset, tradingMode, deliverDate);
 
         /// <inheritdoc />
-        public ILBankRestClientSpotApiShared SharedClient => this;
+        public ILBankRestClientSpotApiShared SharedClient => _sharedApi;
+        /// <inheritdoc />
+        public ILBankRestClientSpotSharedApi SharedApi => _sharedApi;
     }
 }

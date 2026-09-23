@@ -121,11 +121,11 @@ Public streams use the v3 WebSocket implementation by default through `LBankSock
 
 | User intent | Use |
 |---|---|
-| Shared Spot REST | `new LBankRestClient().SpotApi.SharedClient` |
-| Shared Spot socket | `new LBankSocketClient().SpotApi.SharedClient` |
-| Discover supported operations | `sharedClient.Discover()` |
+| Shared Spot REST | `new LBankRestClient().SpotApi.SharedApi` |
+| Shared Spot socket | `new LBankSocketClient().SpotApi.SharedApi` |
+| Resolve a runtime-selected Shared API capability | `ILBankSharedApiClient.GetCapability(...)` |
 | Shared symbol | `new SharedSymbol(TradingMode.Spot, "ETH", "USDT")` |
-| Shared ticker request | `shared.GetSpotTickerAsync(new GetTickerRequest(symbol))` |
+| Shared ticker request | `shared.GetTickerAsync(new GetTickerRequest(symbol))` |
 | Shared ticker subscription | `sharedSocket.SubscribeToTickerUpdatesAsync(new SubscribeTickerRequest(symbol), handler)` |
 
 The REST shared client implements assets, balances, book ticker, deposits, fees, klines, order books, recent trades, withdrawals, Spot symbols/tickers/orders, and client-order-ID support. LBank does not provide a full all-assets query; retrieve a specified asset instead. The socket shared client implements balances, klines, trades, order books, tickers, and Spot orders.

@@ -194,12 +194,12 @@ Use the shared client for exchange-agnostic code:
 using CryptoExchange.Net.SharedApis;
 using LBank.Net.Clients;
 
-var shared = new LBankRestClient().SpotApi.SharedClient;
+var shared = new LBankRestClient().SpotApi.SharedApi;
 var symbol = new SharedSymbol(TradingMode.Spot, "ETH", "USDT");
-var ticker = await shared.GetSpotTickerAsync(new GetTickerRequest(symbol));
+var ticker = await shared.GetTickerAsync(new GetTickerRequest(symbol));
 ```
 
-The REST shared client supports Spot symbols, tickers, orders, balances, assets, book tickers, deposits, withdrawals, fees, klines, order books, and recent trades. The socket shared client supports balances, klines, trades, order books, tickers, and Spot orders. Inspect the corresponding `ILBank*Shared` interface or `Discover()` before relying on a specific shared operation.
+Use the exchange-level `ILBankSharedApiClient` aggregate's `GetCapability(...)` or `GetCapabilities(...)` methods for runtime capability lookup; use an API surface's `.SharedApi` property when the transport and API are known.
 
 Shared book-ticker and user-trade quantities use `SharedOrderQuantity`; read `QuantityInBaseAsset` or `QuantityInQuoteAsset` instead of treating the value as a bare `decimal`. Shared REST and socket order books identify their entry quantities as `SharedQuantityType.BaseAsset`.
 
