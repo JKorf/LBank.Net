@@ -22,5 +22,10 @@ public record LBankDepositAddress
     /// </summary>
     [JsonPropertyName("coin")]
     public string Asset { get; set; } = string.Empty;
+    /// <summary>
+    /// ["<c>networkName</c>"] Network name
+    /// </summary>
+    [JsonPropertyName("networkName")]
+    public string? NetworkName { get; set; }
 }
 

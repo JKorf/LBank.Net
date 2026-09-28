@@ -144,6 +144,24 @@ namespace LBank.Net.Clients.SpotApi
 
         #endregion
 
+        #region Create Deposit Address
+
+        /// <inheritdoc />
+        public async Task<HttpResult<LBankDepositAddress>> CreateDepositAddressAsync(
+            string asset,
+            string network,
+            CancellationToken ct = default)
+        {
+            var parameters = new Parameters(LBankExchange._parameterSerializationSettings);
+            parameters.Add("coin", asset);
+            parameters.Add("networkName", network);
+            var request = _definitions.GetOrCreate(HttpMethod.Post, _baseClient.BaseAddress, "/v2/supplement/add_deposit_address.do", LBankExchange.RateLimiter.RestApi, 1, true);
+            var result = await _baseClient.SendAsync<LBankDepositAddress>(request, parameters, ct).ConfigureAwait(false);
+            return result;
+        }
+
+        #endregion
+
         #region Get Asset Details
 
         /// <inheritdoc />

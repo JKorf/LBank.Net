@@ -132,6 +132,23 @@ namespace LBank.Net.Interfaces.Clients.SpotApi
             CancellationToken ct = default);
 
         /// <summary>
+        /// Create a new deposit address
+        /// <para>
+        /// Docs:<br />
+        /// <a href="https://www.lbank.com/docs/#the-user-adds-a-new-deposit-address" /><br />
+        /// Endpoint:<br />
+        /// POST /v2/supplement/add_deposit_address.do<br />
+        /// </para>
+        /// </summary>
+        /// <param name="asset">["<c>coin</c>"] The asset, for example `eth`</param>
+        /// <param name="network">["<c>networkName</c>"] Network name</param>
+        /// <param name="ct">Cancellation token</param>
+        Task<HttpResult<LBankDepositAddress>> CreateDepositAddressAsync(
+            string asset,
+            string network,
+            CancellationToken ct = default);
+
+        /// <summary>
         /// Get asset details
         /// <para>
         /// Docs:<br />
