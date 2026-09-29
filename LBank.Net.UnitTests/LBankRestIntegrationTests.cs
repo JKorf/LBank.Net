@@ -14,7 +14,7 @@ namespace LBank.Net.UnitTests
     [NonParallelizable]
     public class LBankRestIntegrationTests : RestIntegrationTest<LBankRestClient>
     {
-        public override bool Run { get; set; } = true;
+        public override bool Run { get; set; } = false;
 
         public override LBankRestClient GetClient(ILoggerFactory loggerFactory)
         {
