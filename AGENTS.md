@@ -1,229 +1,51 @@
----
-name: lbank-net
-description: Use LBank.Net when generating C#/.NET code for the LBank Spot REST or WebSocket APIs, including market data, account and wallet operations, order management, subscriptions, local order books, trackers, dependency injection, or CryptoExchange.Net SharedApis.
----
+# Working on LBank.Net
 
-# LBank.Net Skill
+For library development, use this file. For code that consumes the library, read the [LBank.Net skill](.claude/skills/lbank-net/SKILL.md). [llms.txt](llms.txt) indexes the remaining documentation.
 
-## Quick decision
+## Repository layout
 
-Use `LBankRestClient` for REST and `LBankSocketClient` for WebSocket access. Do not generate raw `HttpClient` or `ClientWebSocket` integrations when LBank.Net already exposes the requested operation.
+- [Client interfaces](LBank.Net/Interfaces/Clients/): public endpoint signatures and XML documentation.
+- [Clients](LBank.Net/Clients/): REST, WebSocket, and Shared API implementations, grouped by API and transport.
+- [Models](LBank.Net/Objects/Models/), [options](LBank.Net/Objects/Options/), and [enums](LBank.Net/Enums/): wire models and configuration.
+- [Unit tests](LBank.Net.UnitTests/): request/response fixtures, subscription validation, and example compilation.
+- [AI-friendly examples](Examples/ai-friendly/): complete consumer programs.
 
-LBank.Net currently supports **Spot only**:
+## Build and validation
 
-```csharp
-restClient.SpotApi.ExchangeData
-restClient.SpotApi.Account
-restClient.SpotApi.Trading
-socketClient.SpotApi
+Run commands from the repository root. Use the SDK configured in the [build workflow](.github/workflows/dotnet.yml); targets and dependencies are defined in the [library project](LBank.Net/LBank.Net.csproj).
+
+```sh
+dotnet restore LBank.Net.sln
+dotnet build LBank.Net.sln --no-restore
+dotnet test LBank.Net.UnitTests/LBank.Net.UnitTests.csproj --no-build --filter "FullyQualifiedName!~IntegrationTests"
 ```
 
-Do not invent `FuturesApi`, `DerivativesApi`, margin, or futures methods.
+Debug builds select a subset of frameworks. To check every supported target:
 
-## Installation
-
-```bash
-dotnet add package LBank.Net
+```sh
+dotnet build LBank.Net/LBank.Net.csproj -p:BuildAllFrameworks=true
 ```
 
-Targets: netstandard2.0, netstandard2.1, net8.0, net9.0, net10.0. Native AOT is supported on compatible targets.
+Run focused tests for the change. For edits to consumer examples:
 
-## Symbols and enums
-
-Native LBank symbols use lowercase `base_quote` formatting:
-
-```csharp
-const string symbol = "eth_usdt";
+```sh
+dotnet test LBank.Net.UnitTests/LBank.Net.UnitTests.csproj --filter FullyQualifiedName~AiExampleCompileTests
 ```
 
-REST candles use `KlineInterval`; socket candles use `StreamKlineInterval`. They are different enum types.
+That test compiles the examples; it does not execute their exchange operations or validate Markdown snippets. The normal test command above excludes integration fixtures. Native REST integration has `Run = false`, but native socket integration has `Run = true`; Shared REST integration can be enabled with `INTEGRATION=1`. Inspect integration fixtures before running the unfiltered CI test command; they can contact the exchange. Do not enable authenticated exchange calls as part of routine validation.
 
-LBank combines order side, execution type, and some time-in-force behavior in `OrderType`:
+## Implementation conventions
 
-```csharp
-OrderType.BuyLimit
-OrderType.SellMarket
-OrderType.BuyMaker
-OrderType.SellIoc
-OrderType.BuyFok
-```
+- Use the matching client interface and a neighboring endpoint implementation as the starting point. Preserve endpoint metadata, serialization, signing, rate limits, and cancellation behavior.
+- Update public interfaces and XML documentation together with implementations. Add meaningful request/response or subscription coverage when behavior changes.
+- Keep Shared API adapters consistent with native endpoint behavior; verify capability support and trading modes against the implemented surface.
+- Preserve serialization compatibility and source-generated JSON metadata when changing models.
+- Keep changes compatible with every target in the library project; gate framework-specific APIs where required.
 
-Do not generate separate `OrderSide` or `TimeInForce` arguments for `PlaceOrderAsync`.
+## AI documentation ownership
 
-## Client and result pattern
-
-Public market data needs no credentials:
-
-```csharp
-using LBank.Net.Clients;
-
-var client = new LBankRestClient();
-var result = await client.SpotApi.ExchangeData.GetTickersAsync("eth_usdt");
-
-if (!result.Success)
-{
-    Console.WriteLine(result.Error);
-    return;
-}
-
-var ticker = result.Data.SingleOrDefault();
-Console.WriteLine(ticker?.Ticker.LastPrice);
-```
-
-REST calls return `HttpResult<T>` or `HttpResult`. Socket subscriptions return `WebSocketResult<UpdateSubscription>`. Always check `.Success` before reading `.Data`.
-
-## Authentication
-
-Use `LBankCredentials`, not the base `ApiCredentials` type.
-
-HMAC:
-
-```csharp
-var client = new LBankRestClient(options =>
-{
-    options.ApiCredentials = new LBankCredentials("API_KEY", "API_SECRET");
-});
-```
-
-RSA is also supported through `WithRSAXml(...)`, and through `WithRSAPem(...)` on compatible targets:
-
-```csharp
-var credentials = new LBankCredentials()
-    .WithRSAPem("API_KEY", "PRIVATE_KEY_PEM_OR_BASE64");
-```
-
-Never log or embed real credentials.
-
-## Spot order pattern
-
-```csharp
-using LBank.Net;
-using LBank.Net.Clients;
-using LBank.Net.Enums;
-
-var client = new LBankRestClient(options =>
-{
-    options.ApiCredentials = new LBankCredentials("API_KEY", "API_SECRET");
-});
-
-var order = await client.SpotApi.Trading.PlaceOrderAsync(
-    symbol: "eth_usdt",
-    orderType: OrderType.BuyLimit,
-    quantity: 0.01m,
-    price: 2000m);
-
-if (!order.Success)
-{
-    Console.WriteLine(order.Error);
-    return;
-}
-
-Console.WriteLine(order.Data.OrderId);
-```
-
-For `OrderType.BuyMarket`, `quantity` is denominated in the quote asset. A limit-style order needs `price`; a market order does not.
-
-`GetOrderAsync` and `CancelOrderAsync` accept either `orderId` or `clientOrderId`. `GetOrdersAsync` and `GetOpenOrdersAsync` require `page` and `pageSize`.
-
-The upstream LBank order API may not be publicly accessible to every account. Preserve result/error handling even when the code is structurally correct.
-
-## WebSocket pattern
-
-```csharp
-using LBank.Net.Clients;
-
-var socketClient = new LBankSocketClient();
-var sub = await socketClient.SpotApi.SubscribeToTickerUpdatesAsync(
-    "eth_usdt",
-    update => Console.WriteLine(update.Data.LastPrice));
-
-if (!sub.Success)
-{
-    Console.WriteLine(sub.Error);
-    return;
-}
-
-await socketClient.UnsubscribeAsync(sub.Data);
-```
-
-Public subscriptions include trades, klines, order books, and tickers. Order book depth must be `10`, `50`, or `100`.
-
-Private order and balance subscriptions accept a listen key. Passing `null` lets an authenticated socket client acquire and maintain one:
-
-```csharp
-var sub = await socketClient.SpotApi.SubscribeToOrderUpdatesAsync(
-    listenKey: null,
-    update => Console.WriteLine(update.Data.Status));
-```
-
-`LBankSocketOptions.UseV3` defaults to `true` for public streams. Set it to `false` only when the documented v2 socket behavior is specifically required. Private streams use the appropriate authenticated flow.
-
-## Dependency injection and local order book
-
-```csharp
-using LBank.Net.Interfaces;
-using Microsoft.Extensions.DependencyInjection;
-
-services.AddLBank(options =>
-{
-    options.ApiCredentials = new LBankCredentials("API_KEY", "API_SECRET");
-});
-```
-
-Inject `ILBankRestClient`, `ILBankSocketClient`, `ILBankOrderBookFactory`, or `ILBankTrackerFactory`.
-
-```csharp
-var factory = provider.GetRequiredService<ILBankOrderBookFactory>();
-var book = factory.CreateSpot("eth_usdt", options => options.Limit = 50);
-
-var start = await book.StartAsync();
-if (start.Success)
-{
-    var snapshot = book.Book;
-    await book.StopAsync();
-}
-```
-
-The tracker factory can create Spot kline, trade, and authenticated user-data trackers.
-
-## Multi-exchange SharedApis
-
-Use the shared client for exchange-agnostic code:
-
-```csharp
-using CryptoExchange.Net.SharedApis;
-using LBank.Net.Clients;
-
-var shared = new LBankRestClient().SpotApi.SharedApi;
-var symbol = new SharedSymbol(TradingMode.Spot, "ETH", "USDT");
-var ticker = await shared.GetTickerAsync(new GetTickerRequest(symbol));
-```
-
-Use the exchange-level `ILBankSharedApiClient` aggregate's `GetCapability(...)` or `GetCapabilities(...)` methods for runtime capability lookup; use an API surface's `.SharedApi` property when the transport and API are known.
-
-Shared book-ticker and user-trade quantities use `SharedOrderQuantity`; read `QuantityInBaseAsset` or `QuantityInQuoteAsset` instead of treating the value as a bare `decimal`. Shared REST and socket order books identify their entry quantities as `SharedQuantityType.BaseAsset`.
-
-## Common pitfalls
-
-- Do not use Binance-style symbols such as `ETHUSDT` for native calls; use `eth_usdt`.
-- Do not invent Futures or margin roots.
-- Do not split order side and type; use LBank's combined `OrderType`.
-- Do not pass `KlineInterval` to a socket method or `StreamKlineInterval` to a REST method.
-- Do not omit required `limit` and `afterTime` arguments from `GetKlinesAsync`.
-- Do not omit required pagination from `GetOrdersAsync` or `GetOpenOrdersAsync`.
-- Do not read `.Data` until `.Success` is true.
-- Do not create a client for every request.
-- Do not block async calls with `.Result` or `.Wait()`.
-- Do not forget to unsubscribe and stop local order books during shutdown.
-- Do not assume sandbox/testnet exists; the built-in environment is `LBankEnvironment.Live`, with custom endpoints available through `CreateCustom`.
-- Do not call the shared all-assets operation expecting it to work; LBank can retrieve asset configuration only for a specified asset.
-
-## Reference
-
-- Full context: `llms-full.txt`
-- Intent map: `docs/ai-api-map.md`
-- Compilable examples: `Examples/ai-friendly/`
-- Source interfaces: `LBank.Net/Interfaces/Clients/**`
-- Documentation: https://cryptoexchange.jkorf.dev/docs/exchange-clients?library=LBank.Net
-- Repository: https://github.com/JKorf/LBank.Net
-- NuGet: https://www.nuget.org/packages/LBank.Net
+- [SKILL.md](.claude/skills/lbank-net/SKILL.md) owns consumer conventions and routes to detailed skill references.
+- [API surfaces](.claude/skills/lbank-net/references/api-surfaces.md) owns endpoint routing; [usage](.claude/skills/lbank-net/references/usage.md) owns snippets.
+- Link to those files instead of repeating API guides here or in tool-specific instructions.
+- Keep skill links relative. References outside the skill are checkout-only; packaged guidance must remain usable without repository sources.
+- The project packs [.claude/skills](.claude/skills/) into `skills/` in NuGet. After changing its layout, inspect package entries and verify referenced resources are included.

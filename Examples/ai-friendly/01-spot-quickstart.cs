@@ -8,7 +8,7 @@ using LBank.Net;
 using LBank.Net.Clients;
 using LBank.Net.Enums;
 
-var client = new LBankRestClient(options =>
+using var client = new LBankRestClient(options =>
 {
     // Credentials are only required for Account and Trading endpoints.
     options.ApiCredentials = new LBankCredentials("API_KEY", "API_SECRET");

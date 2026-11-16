@@ -1,23 +1,8 @@
-# LBank.Net AI API Quick Map
-
-Route user intent to the implemented LBank.Net member shown here. The source interfaces under `LBank.Net/Interfaces/Clients/**` are authoritative if a signature is not listed.
+# LBank.Net API surfaces
 
 ## Client roots
 
-| User intent | Use |
-|---|---|
-| Public or private REST | `new LBankRestClient()` |
-| WebSocket streams | `new LBankSocketClient()` |
-| Spot REST | `restClient.SpotApi` |
-| Spot WebSocket | `socketClient.SpotApi` |
-| HMAC authentication | `new LBankCredentials("API_KEY", "API_SECRET")` |
-| RSA XML authentication | `new LBankCredentials().WithRSAXml(key, privateKey)` |
-| RSA PEM authentication | `new LBankCredentials().WithRSAPem(key, privateKey)` on compatible targets |
-| Dependency injection | `services.AddLBank(options => { ... })` |
-| Live environment | `LBankEnvironment.Live` |
-| Custom API addresses | `LBankEnvironment.CreateCustom(...)` |
-
-There is no Futures, derivatives, or margin root. Native symbol examples use lowercase `base_quote`, such as `eth_usdt`.
+`LBankRestClient` / `ILBankRestClient` expose `SpotApi` with `ExchangeData`, `Account`, and `Trading`. `LBankSocketClient` / `ILBankSocketClient` expose subscriptions directly on `SpotApi`. The library has no Futures, derivatives, margin, or Unified root.
 
 ## Spot REST market data
 
@@ -117,30 +102,35 @@ Public streams use the v3 WebSocket implementation by default through `LBankSock
 | Create trade tracker | `trackerFactory.CreateTradeTracker(symbol, ...)` |
 | Create configured user tracker | `trackerFactory.CreateUserSpotDataTracker(...)` |
 
-## SharedApis
+## Request limits and workflow details
 
-| User intent | Use |
-|---|---|
-| Shared Spot REST | `new LBankRestClient().SpotApi.SharedApi` |
-| Shared Spot socket | `new LBankSocketClient().SpotApi.SharedApi` |
-| Resolve a runtime-selected Shared API capability | `ILBankSharedApiClient.GetCapability(...)` |
-| Shared symbol | `new SharedSymbol(TradingMode.Spot, "ETH", "USDT")` |
-| Shared ticker request | `shared.GetTickerAsync(new GetTickerRequest(symbol))` |
-| Shared ticker subscription | `sharedSocket.SubscribeToTickerUpdatesAsync(new SubscribeTickerRequest(symbol), handler)` |
+REST order-book depth is at most 200, recent public trades at most 500, and candles at most 2000. REST candles require both `limit` and `afterTime`; user trades have a maximum limit of 100. Order history/open-order pagination requires `page` and `pageSize` (maximum 200). Use exactly one of exchange order ID and client order ID for lookup or cancellation.
 
-The REST shared client implements assets, balances, book ticker, deposits, fees, klines, order books, recent trades, withdrawals, Spot symbols/tickers/orders, and client-order-ID support. LBank does not provide a full all-assets query; retrieve a specified asset instead. The socket shared client implements balances, klines, trades, order books, tickers, and Spot orders.
+Private stream listen keys can be supplied explicitly or managed by a credentialed socket client. Native `GetPriceAsync`, `GetTickersAsync`, and leveraged-token ticker calls return arrays. Native ticker prices are under `LBankSymbolTicker.Ticker.LastPrice`. For per-user cached clients use `ILBankUserClientProvider`; clear cached clients when credentials change. Trackers and local books should be owned for the application service lifetime.
 
-## Result handling and routing pitfalls
+## Shared API V2
 
-| Avoid | Use |
-|---|---|
-| Reading `result.Data` immediately | Check `result.Success` first |
-| `ETHUSDT` for native calls | `eth_usdt` |
-| `FuturesApi` or `DerivativesApi` | `SpotApi` |
-| Separate side and time-in-force parameters | Combined `OrderType` |
-| `KlineInterval` on sockets | `StreamKlineInterval` |
-| Omitting order-history pagination | Supply `page` and `pageSize` |
-| Arbitrary socket depth | `10`, `50`, or `100` |
-| Raw HTTP/socket code | `LBankRestClient` / `LBankSocketClient` |
-| Base `ApiCredentials` | `LBankCredentials` |
-| Assuming testnet | `LBankEnvironment.Live` or an explicit custom environment |
+`ILBankSharedApiClient` exposes these aggregate properties. The corresponding native surfaces expose `.SharedApi`.
+
+- `SpotRest` (`ILBankRestClientSpotSharedApi`): `IGetAssetRest`, `IGetBalancesRest`, `IGetBookTickerRest`, `IGetDepositAddressesRest`, `IGetDepositHistoryRest`, `IGetFeesRest`, `IGetKlinesRest`, `IGetOrderBookRest`, `IGetRecentTradesRest`, `IGetWithdrawalHistoryRest`, `IWithdrawRest`, `IGetSpotSymbolsRest`, `IGetTickerRest`, `IGetAllTickersRest`, `IPlaceSpotOrderRest`, `IGetSpotOrderRest`, `IGetOpenSpotOrdersRest`, `IGetClosedSpotOrdersRest`, `IGetSpotOrderTradesRest`, `IGetSpotUserTradeHistoryRest`, `ICancelSpotOrderRest`, `IGetSpotOrderByClientOrderIdRest`, `ICancelSpotOrderByClientOrderIdRest`.
+- `SpotSocket` (`ILBankSocketClientSpotSharedApi`): `ISubscribeBalancesSocket`, `ISubscribeKlinesSocket`, `ISubscribeTradesSocket`, `ISubscribeOrderBookSocket`, `ISubscribeTickerSocket`, `ISubscribeSpotOrdersSocket`.
+
+For known workflows use an aggregate property or inject the narrow capability. For dynamic selection, call `aggregate.GetCapability(SharedCapabilities.Tickers.GetTicker.Rest, tradingMode: TradingMode.Spot)` and check for null before using the match's `Capability` and `Options`. A descriptor identifies an operation; it does not guarantee support. `GetCapabilities` enumerates matches and `Discover` summarizes metadata. With several exchanges registered, inject `IEnumerable<TCapability>` and select by exchange, supported mode, and options.
+
+There is no `IGetAllAssetsRest` capability; use `IGetAssetRest` for a specified asset. Socket capabilities are subscriptions; they do not provide place/cancel order requests.
+
+## Symbols, catalogs, and quantities
+
+Native symbols normally use lowercase `base_quote`, e.g. `eth_usdt`. Some method documentation uses compact uppercase inputs, such as asset details/trade fees; check that method's signature and XML documentation. `SharedSymbol(TradingMode.Spot, "ETH", "USDT")` and `LBankExchange.FormatSymbol` support reusable formatting.
+
+Call `IGetSpotSymbolsRest.GetSpotSymbolsAsync(new GetSymbolsRequest())`, check success, then read `SpotSymbolCatalog`. Discovery merges symbol rules and available symbols. Requests honor base/quote asset type/subtype filters. Returned metadata includes display names, precision, quantity steps, minimum quantity, and availability; classification covers crypto, stablecoins, fiat, and TradFi equity/commodity where populated.
+
+Shared order books use `SharedQuantityType.BaseAsset`. Shared results use `SharedOrderQuantity`; select base/quote fields according to the returned operation and quantity support. Native market buys use quote-asset quantity, while other orders normally use base quantity. Inspect `PlaceSpotOrderOptions` and supported quantity metadata before selecting Shared sizing; do not translate a quote-sized market buy as base quantity.
+
+## Environments and checkout-only sources
+
+Only `LBankEnvironment.Live` is built in. `LBankEnvironment.CreateCustom(...)` configures explicit addresses; it does not imply an official testnet. Public sockets default to v3 through `LBankSocketOptions.UseV3 = true`; false selects v2.
+
+- [Public interfaces](../../../../LBank.Net/Interfaces/Clients/): exact signatures and method-specific symbol requirements (checkout-only).
+- [Client implementations](../../../../LBank.Net/Clients/): Shared options, conversion and classification (checkout-only).
+- [Complete examples](../../../../Examples/ai-friendly/): independently compilable programs (checkout-only).

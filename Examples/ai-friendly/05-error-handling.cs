@@ -8,8 +8,8 @@ using CryptoExchange.Net.Objects;
 using CryptoExchange.Net.Objects.Sockets;
 using LBank.Net.Clients;
 
-var restClient = new LBankRestClient();
-var socketClient = new LBankSocketClient();
+using var restClient = new LBankRestClient();
+using var socketClient = new LBankSocketClient();
 
 // API and network failures are returned as HttpResult<T>; inspect Success before Data.
 var book = await WithRetry(
@@ -33,6 +33,7 @@ if (!EnsureSocketSuccess(subscription, "subscribe to trades"))
 
 await socketClient.UnsubscribeAsync(subscription.Data);
 
+// Public reads only: reconcile uncertain orders/withdrawals before deciding to resubmit.
 static async Task<HttpResult<T>> WithRetry<T>(
     Func<Task<HttpResult<T>>> call,
     int maxAttempts = 3)

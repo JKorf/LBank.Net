@@ -8,7 +8,7 @@ using LBank.Net;
 using LBank.Net.Clients;
 using LBank.Net.Enums;
 
-var socketClient = new LBankSocketClient(options =>
+using var socketClient = new LBankSocketClient(options =>
 {
     // Only the private order subscription requires credentials.
     options.ApiCredentials = new LBankCredentials("API_KEY", "API_SECRET");
