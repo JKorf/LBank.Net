@@ -50,8 +50,8 @@ namespace LBank.Net
             var restClient = _serviceProvider?.GetRequiredService<ILBankRestClient>() ?? new LBankRestClient();
             var socketClient = _serviceProvider?.GetRequiredService<ILBankSocketClient>() ?? new LBankSocketClient();
 
-            var sharedRestClient = restClient.SpotApi.SharedClient;
-            var sharedSocketClient = socketClient.SpotApi.SharedClient;
+            var sharedRestClient = restClient.SpotApi.SharedApi;
+            var sharedSocketClient = socketClient.SpotApi.SharedApi;
 
             return new KlineTracker(
                 _serviceProvider?.GetRequiredService<ILoggerFactory>().CreateLogger(restClient.Exchange),
@@ -70,8 +70,8 @@ namespace LBank.Net
             var restClient = _serviceProvider?.GetRequiredService<ILBankRestClient>() ?? new LBankRestClient();
             var socketClient = _serviceProvider?.GetRequiredService<ILBankSocketClient>() ?? new LBankSocketClient();
 
-            var sharedRestClient = restClient.SpotApi.SharedClient;
-            var sharedSocketClient = socketClient.SpotApi.SharedClient;
+            var sharedRestClient = restClient.SpotApi.SharedApi;
+            var sharedSocketClient = socketClient.SpotApi.SharedApi;
 
             return new TradeTracker(
                 _serviceProvider?.GetRequiredService<ILoggerFactory>().CreateLogger(restClient.Exchange),
